@@ -19,79 +19,65 @@ Agentic commerce asks you to hand over a purchase: "buy me a good phone under $1
 
 People already distrust AI that thinks for them, or that might be steered by whoever runs it. STARK-Decisions responds in two ways:
 
-- **The user keeps control.** You set the criteria (weights), they are hashed before any product is scored, and the agent never picks for you. The final brief explicitly does not choose; it ends by naming the one factor that should decide it. The decision stays yours.
-- **The agent's work is checkable.** Nothing asks for faith. Your browser re-runs the scorer, and a CLI can re-run the research loop. If the server cheated, a check fails.
+- **The user keeps control.** You set the criteria (weights), they are hashed before anything is researched, and the agent never picks for you. The shortlist is three options with a brief, and the decision stays yours.
+- **The agent's work is checkable.** Nothing asks for faith. The receipt is signed and hash-chained, and a check fails if the catalog, the model commitment or the counterfactual picks don't line up.
 
 ## How it works
 
 ```
-criteria ──► [1] RESEARCH LOOP ──► findings ──► [2] DECISION MODEL ──► top 3 ──► brief ──► signed receipt
- (hashed)     Qwen3.5-27B, every    (numbers)      open scorer,                  (no pick)   Ed25519
-              option, chained                      swap test
+criteria ──► research (every candidate) ──► rank: top 3 + brief ──► counterfactual re-rank ──► signed receipt
+ (hashed)         ONE model: Qwen3.5-27B, open weights, temperature 0
+                  a STARK proof of inference on every step (simulated in this demo)
 ```
 
-### Step 1: auto-research loop (Qwen3.5-27B)
+There is no separate decision model. One LLM (Qwen3.5-27B) does everything, and every step carries a proof of inference, so you know the same audited model ran at every step.
 
-- The research agent (open weights, temperature 0, pinned weights digest) researches **every** option in the catalog, not a shortlist. Each product gets 2 rounds of question then answer: it asks the most useful next question a careful buyer should check and answers from the spec sheet and widely known facts. It is told not to praise or criticize the brand. No web access in this build.
-- Each step ends with a `Found:` line restating the facts it used as structured numbers (e.g. camera, battery, performance, price for phones; rating, delivery speed, health, price for restaurants).
-- Determinism: temperature 0, seed 42, `num_predict` 220, and the Ollama weights digest pinned.
-- Every step (prompt, output, hashes of both) is hash-chained. The chain starts from `sha256(policy + catalog hash)`, and each step stores the previous step's hash.
+### Steps
 
-### Step 2: decision model (`decision.js`)
+1. **Research.** The model researches every candidate in the committed catalog. Each step ends with a `Found:` line restating the spec numbers it used.
+2. **Rank.** The same model gets the findings and the committed criteria, outputs `Top 3: id, id, id`, and writes a short brief. It does not pick for the user.
+3. **Counterfactual.** The same model re-ranks the same findings with brand names rotated between options (option i carries option i+1's name, brand and OS; specs stay put). This run is proven too.
 
-- An open, deterministic scorer. It takes the research findings as input, hides brand names, and scores **those numbers only** (normalized per attribute across the catalog, weighted by the user's criteria; price is inverted). Name, brand and OS are never inputs. The verifier checks that the decision model's inputs match the research findings.
-- The user's criteria are committed via SHA-256 (`policy_hash`) before anything is researched or scored.
-- **Identity-swap counterfactual test.** Keep each option's numbers fixed, permute the identity fields (name, brand, os) across options, re-score, and record the maximum score change. For a neutral scorer this is exactly 0. The receipt records `swap_max_delta` and the number of swaps.
-- Output: the top 3 options.
-- The same file runs on the server and in the browser, so anyone can re-execute it. Its hash is recorded in the receipt as `scorer_hash`.
+Determinism: temperature 0, seed 42, `think: false`.
 
-### Brief and your choice
+### The three guarantees
 
-- A short brief covers the top 3: for each option, who it suits and one trade-off. It does **not** choose for the user; the user makes the final choice.
+1. **Same model.** Every step's proof verifies against the published weights commitment in `model.json` (the real sha256 of the Qwen3.5-27B weights layer from the Ollama registry).
+2. **Candidates correct.** The candidate list is the committed catalog (`catalog_hash`), every candidate is researched, and every fact the model cites in a `Found:` line matches the catalog.
+3. **Unbiased.** A fair model's picks follow the specs, so the counterfactual top 3 (as spec bundles) must equal the real top 3.
 
-### The receipt (from `server.mjs`)
+### Proofs: simulated in this demo
 
-An Ed25519-signed JSON document containing:
+**The STARK proofs in this demo are simulated** by a hash stand-in, because we lacked the compute. `model.json` (`proof_note`) says so. For each step, `proof = sha256("mock-stark|" + weights_commitment + "|" + prompt_hash + "|" + output_hash)`, with `proof_system: "mock-stark-v0"`. This only shows that the receipt is consistent; it does not prove any inference ran. Real zkSTARK proving is the design (FlashProve-style, see below) and is not built.
 
-- `policy` and `policy_hash` (the committed criteria)
-- `catalog_hash` (hash of `catalog.json`)
-- `decision`: `scorer: "decision.js"`, `scorer_hash`, `top`, per-option `scores`, `swap_max_delta`, `swaps`
-- `research`: `model`, `model_digest` (Ollama weights digest), `options` (temperature, seed, num_predict), `rounds`, `steps` (each with `kind`, `product`, `round`, `prompt`, `prompt_hash`, `output`, `output_hash`, `prev`, `hash`), and `chain_head`
-- `public_key`, `receipt_hash` (SHA-256 of the canonical body) and `signature`
+### The receipt (v3, from `server.mjs`)
 
-The private key stays local (`.keys/`, gitignored); the public key is published in `public-key.txt`.
+An Ed25519-signed JSON document:
+
+- `catalog`, `catalog_hash`, `policy` (weights, k = 3), `policy_hash`
+- `model`: `name`, `weights_commitment`, `proof_system`
+- `steps`: `research` (per product), `rank` (with `top`), `counterfactual` (with `relabel` and `top`); each has `prompt`, `prompt_hash`, `output`, `output_hash`, `proof`, `prev`, `hash`
+- `chain_head`, `public_key`, `receipt_hash` (SHA-256 of the canonical body) and `signature`
+
+The first `prev` is `sha256(policy_hash + catalog_hash + weights_commitment)`; each step's `hash` is `sha256(canon(step without hash))`. The private key stays local (`.keys/`, gitignored); the public key is in `public-key.txt`.
 
 ### Verification
 
-`verify.js` is shared by the browser and the CLI. It checks:
+`verify.js` checks the receipt hash and signature, the policy and catalog hashes, the weights commitment against `model.json`, the hash chain, each step's proof, that every candidate was researched, that `Found:` lines match the catalog, and that the counterfactual top 3 equals the real top 3.
 
-1. the receipt hash and Ed25519 signature
-2. the policy hash
-3. the catalog hash against the published `catalog.json`
-4. the scorer hash against the published `decision.js`
-5. the decision model's inputs against the research findings
-6. the ranking, by **re-executing** `decision.js` and comparing top 3 and scores
-7. the swap test, which must show max Δ of 0
-8. the research hash chain, step by step
-9. that the model weights digest is pinned
+### What "verifiable" means today
 
-`node verify.mjs receipt.json --rerun` goes further: it checks the local Ollama digest matches the receipt, re-runs every research prompt at temperature 0, and checks each output hashes to the recorded value.
-
-### What "verifiable" means today, and what it will mean
-
-**Today** it means reproducible re-execution plus signatures plus a hash chain. That is real, but verifying the research step requires the verifier to have the same weights and a GPU (or patience) to re-run it. It also relies on greedy decoding being bit-reproducible on the verifier's setup, so a different runtime can in principle fail a legitimate run.
-
-**Future:** a zero-knowledge proof of inference, as in Anthropic's FlashProve research (below). A proof would let anyone verify that the committed weights produced those exact tokens without holding the weights or a GPU. The proof family is hash-based (STARK-style), which is the "STARK" in the name. We do not implement a proof here and don't claim to.
+Today the proof check is a hash stand-in, so it shows consistency of the receipt, not that the weights ran. The signature and hash chain are real. A real proof of inference would let anyone check, without the weights or a GPU, that the committed weights produced those exact tokens.
 
 ## Run it
 
 ```
 ollama pull qwen3.5:4b             # qwen3.5:27b on a bigger machine
 node server.mjs                    # http://localhost:8787
-node verify.mjs receipts/latest.json --rerun
+node verify.mjs receipts/latest.json
 ```
 
-Env vars: `MODEL` (default `qwen3.5:4b`), `OLLAMA_URL` (default `http://127.0.0.1:11434`), `ROUNDS` (default 2), `PORT` (default 8787).
+Env vars: `MODEL` (default `qwen3.5:4b`), `OLLAMA_URL` (default `http://127.0.0.1:11434`), `PORT` (default 8787).
 
 **Compute note:** Qwen3.5-27B is the target model. It needs about 20 GB of memory, and our laptops have 16 GB, so the live run uses `qwen3.5:4b` through the identical code path. Set `MODEL=qwen3.5:27b` and point `OLLAMA_URL` at a bigger box to run the target. Without the server (e.g. on the static site), the page replays a recorded signed run and verifies it in the browser.
 
@@ -104,42 +90,40 @@ In early November 2026, Anthropic published research on **provable inference** (
 - Demo: Llama 4 Maverick (400B MoE). Proving runs at about 110 tok/s on one H100, at 70-95x normal GPU cost. Proofs are about 19 MB per 1,024 tokens. Verification takes about 17 s on a CPU and needs no weights. Key security properties are machine-checked in Lean. The code is Apache-2.0.
 - **Limits:** it covers integer, greedy-decoding inference only, contexts up to 1,024 tokens and MoE models only. It hides the weights but not the architecture. It gives no confidentiality for prompts or outputs. It is a research prototype and isn't deployed for Claude.
 
-Our research loop already uses greedy decoding and short contexts, which is the regime this kind of proof targets.
+Our steps use greedy decoding and short contexts, which is the regime this kind of proof targets.
 
 **Related and complementary tech:**
 - **GPU TEEs / confidential computing** (NVIDIA H100 CC mode; ~4-8% overhead, https://arxiv.org/abs/2409.03992). Hardware attestation of which model runs, and it also keeps the prompt private. It trusts the hardware vendor, whereas a ZK proof trusts only the math. In production, combine them: a TEE for privacy and the proof for public verifiability.
-- **zkML** (EZKL proves ONNX inference with Halo2 SNARKs, https://ezkl.xyz). Practical for small scoring models today, so a small open scorer could be proven this way.
 - **Survey** of ZK verifiable inference: https://arxiv.org/pdf/2511.19902
 
 ## Threat model
 
 | Attack | Defense | Residual risk |
 |---|---|---|
-| Brand preference trained into the ranking model | Scorer is open, deterministic and specs-only; the browser re-executes it; identity-swap test per decision | Bias carried through correlated attributes (over-weighting "ecosystem") |
-| Server shows a ranking it didn't compute (e.g. secretly favors a brand; the demo has a "cheating server" toggle) | Re-executed ranking and `scorer_hash` checks fail; swap test fails | None for the ranking, since it is fully re-executable |
-| Fair research model for audits, different one in production | Pinned weights digest, temperature 0 and seed; `--rerun` reproduces outputs | Today the verifier needs the weights and must trust that the digest names what ran; closed by ZK proof of inference later |
-| Research text slanted toward a product | Hash-chained prompts and outputs are inspectable and re-runnable; brief doesn't pick | The model's own knowledge can still be wrong or skewed; a human reads the steps |
-| Criteria changed after seeing the catalog | Policy hash committed first and included in the signed receipt | The user's own preferences are their call |
+| A different model than the audited one | Per-step proofs against the published weights commitment | In this demo the proofs are simulated; real zkSTARK proving is next |
+| Candidates dropped or facts altered | Catalog hash; every candidate researched; `Found:` lines checked against the catalog | Catalog data itself may be false |
+| Brand preference in the model | Counterfactual re-rank with names rotated; top 3 as spec bundles must match | Bias via correlated attributes; one rotation is a sample, not a proof of fairness |
+| Criteria changed after seeing the catalog | Policy hash committed first and signed | The user's own preferences are their call |
 | Tampering with a receipt | Ed25519 signature over the receipt hash; hash chain | Trust in the published public key |
-| Prompt injection in listings | Scorer consumes only typed numeric attributes; the research prompt uses the spec sheet, not free-text listing copy | Fake specs need merchant-side verification |
-| Paid placement | Sponsorship excluded from scoring and disclosed separately | None in scoring |
+| Prompt injection in listings | Prompts use typed spec numbers, not free-text listing copy | Fake specs need merchant-side verification |
+| Paid placement | Excluded from the prompts and disclosed separately | None in the prompts |
 
 ## Why it fits each track
 
-- **Sandia (secure AI and agentic workflows):** a concrete agentic workflow with cryptographic commitments, a reproducible and signed agent trace, an adversarial test for hidden model behavior, and a clear path to proofs of inference. Security is measurable (Δ, hash checks, signatures) rather than a policy promise.
+- **Sandia (secure AI and agentic workflows):** a concrete agentic workflow with cryptographic commitments, a signed, hash-chained agent trace, a counterfactual test for hidden model behavior, and a clear path to proofs of inference. Security is measurable (Δ, hash checks, signatures) rather than a policy promise.
 - **DoorDash Merchant Experience:** as agents start doing the ordering, merchants need a ranking they can trust and learn from. The receipt shows a merchant which specs cost them the pick and that their name didn't.
-- **DoorDash Most Creative:** it pairs a neutral, auditable shortlist with an open-weights research agent and treats the verifiable-inference idea as the roadmap, so the user stays in charge while the agent does the legwork.
+- **DoorDash Most Creative:** it pairs one open-weights model that researches and ranks, with a counterfactual check, and treats the verifiable-inference idea as the roadmap, so the user stays in charge while the agent does the legwork.
 
 ## What it doesn't cover yet
 
-- **Proof without re-running.** Verifying the research step means re-running it on the same weights. ZK proof of inference would remove that.
-- **Correlated bias.** A scorer can still over-weight a trait one brand happens to have. Attribute-level counterfactuals are next.
-- **False specs.** Fair scoring on false numbers is still wrong; catalog data needs its own verification.
-- **Illustrative data.** Phone specs in the demo are illustrative, and the research model has no web access.
+- **Real proofs.** The STARK proofs are simulated in this demo. Real zkSTARK proving (FlashProve-style) is next.
+- **Correlated bias.** A model can still over-weight a trait one brand happens to have. Attribute-level counterfactuals are next.
+- **False specs.** Fair ranking on false numbers is still wrong; catalog data needs its own verification.
+- **Illustrative data.** Phone specs in the demo are illustrative, and the model has no web access.
 
 ## Next steps
 
-1. Swap re-execution for a real proof of inference (FlashProve-style) on the research step.
-2. Prove the scorer with EZKL, and keep receipts in an append-only transparency log.
+1. Replace the hash stand-in with a real proof of inference (FlashProve-style) on every step.
+2. Keep receipts in an append-only transparency log.
 3. Attribute-level counterfactuals for correlated bias.
 4. A merchant dashboard that aggregates receipts into "you lost 62% of picks on ETA."

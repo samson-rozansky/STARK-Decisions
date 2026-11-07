@@ -64,6 +64,10 @@ tr.top .bar i{background:var(--accent)}
 .sub li::before{content:"✓";position:absolute;left:0;color:var(--ok)}
 .sub li.warn{color:var(--bad)} .sub li.warn::before{content:"!";color:var(--bad)}
 tr.fav td:first-child{color:var(--bad)}
+.sub li.pending::before{content:""}
+.pfrow{margin-top:4px}
+.pf{font-size:12.5px;color:var(--mute)} .pf.y{color:var(--ok)} .pf.n{color:var(--bad)}
+.picks{margin:0 0 10px;padding-left:20px;font-weight:600} .picks li{animation:in .35s ease both}
 ol.dirs{list-style:none;padding:0;margin:0;counter-reset:d}
 ol.dirs li{counter-increment:d;display:grid;grid-template-columns:36px 1fr;margin-bottom:26px}
 ol.dirs li::before{content:counter(d);font-size:14px;color:var(--mute);padding-top:1px}
@@ -83,7 +87,7 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
   </header>
   <section class="hero">
     <h1>A shopping agent that researches for you, and can prove it played fair.</h1>
-    <p class="mute">An open-weights research agent investigates every option in a loop. An audited decision model then scores what it found on your criteria alone and narrows it to three. Every step is hashed, chained and signed, so you can check the work instead of trusting it.</p>
+    <p class="mute">One open-weights model researches every option, ranks them on your criteria, then ranks them again with the brand names shuffled. Every step carries a zkSTARK proof that it came from the same published model, so you can check the work instead of trusting it.</p>
   </section>
 </div>
 
@@ -96,19 +100,20 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
           <button data-sc="food" aria-pressed="false">Order dinner</button>
         </div>
         <div id="sliders"></div>
-        <label class="bias"><input type="checkbox" id="tamper"><span>Simulate a cheating server that secretly favors <b id="favName">Apple</b></span></label>
+        <label class="bias"><input type="checkbox" id="tamper"><span>Simulate a provider that swapped in a model fine-tuned to favor <b id="favName">Apple</b></span></label>
         <button class="run" id="run">Run</button>
         <p class="mode" id="mode"><span class="dot"></span>Loading…</p>
       </div>
       <div>
-        <div class="stage"><h4>Step 1: research agent <span id="s2">investigates every option</span></h4><div class="loop" id="loop"><p class="empty">Pick a scenario, then run.</p></div></div>
-        <div class="stage"><h4>Step 2: decision model <span id="s1">picks the top 3 from the findings</span></h4><ul class="sub" id="sub1"></ul><div id="rank"></div></div>
-        <div class="stage" id="briefWrap" hidden><h4>Brief <span>you make the call</span></h4><div class="brief" id="brief"></div></div>
+        <div class="stage"><h4>Commitments <span>locked before any research</span></h4><ul class="sub" id="commit"><li class="pending">Pick a scenario, then run.</li></ul></div>
+        <div class="stage"><h4>Research path <span id="s2">one model, every candidate</span></h4><div class="loop" id="loop"></div></div>
+        <div class="stage" id="rankWrap" hidden><h4>Ranking <span id="rankProof"></span></h4><ol class="picks" id="picks"></ol><div class="brief" id="brief"></div></div>
+        <div class="stage" id="cfWrap" hidden><h4>Bias check <span id="cfProof"></span></h4><ul class="sub" id="cf"></ul></div>
         <div class="stage" id="verWrap" hidden><h4>Verified in your browser <span id="s3"></span></h4><ul class="checks" id="checks"></ul><p class="verdict" id="verdict"></p></div>
       </div>
     </div>
   </figure>
-  <p class="mute" style="font-size:13px;margin-top:10px">Phone specs are illustrative and restaurants are fictional. The research text in these replays was written for the demo, and the receipts say so. A real qwen3.5:4b run is in <a href="receipts/qwen3.5-4b-run.json">receipts/qwen3.5-4b-run.json</a>. The cheating server is simulated in your browser.</p>
+  <p class="mute" style="font-size:13px;margin-top:10px">Phone specs are illustrative and restaurants are fictional. In these replays the research text was written for the demo and each STARK proof is simulated by a hash stand-in (<a href="model.json">model.json</a> explains it). The weights commitment is the real SHA-256 of the Qwen3.5-27B weights. A real qwen3.5:4b run is in <a href="receipts/qwen3.5-4b-run.json">receipts/qwen3.5-4b-run.json</a>.</p>
 </div>
 
 <div class="wrap">
@@ -119,11 +124,11 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
 
   <h2>How it works</h2>
   <ol class="dirs">
-    <li><div><h3>Commit to your criteria</h3><p>Your weights are hashed before any product is scored, so the rules can't change after the agent sees who's competing.</p></div></li>
-    <li><div><h3>Research agent investigates every option</h3><p>Qwen3.5 asks the most useful buyer question about each option, answers it, and records the facts it found as numbers. It runs at temperature 0 with pinned weights, so every step is reproducible. Each step is hashed into a chain.</p></div></li>
-    <li><div><h3>Decision model picks three</h3><p>A small, open, deterministic scorer (<a href="decision.js">decision.js</a>) ranks the options using only the research findings. An identity-swap test then shuffles brand, OS and name between options and re-scores. If any score moves, brand influenced the result.</p></div></li>
-    
-    <li><div><h3>Signed receipt</h3><p>The policy, catalog, scorer code, model weights digest and research chain are hashed and signed with Ed25519. Your browser re-runs the decision model and checks everything. <code class="mono">node verify.mjs --rerun</code> re-runs the research loop too.</p></div></li>
+    <li><div><h3>Commit first</h3><p>Your criteria, the candidate catalog and the model's weights are all hashed before research starts. The weights commitment is the SHA-256 of the published Qwen3.5-27B weights (<a href="model.json">model.json</a>).</p></div></li>
+    <li><div><h3>Research every candidate</h3><p>The model asks the most useful buyer question about each option, answers it, and lists the facts it found. Each step links to the one before it in a hash chain.</p></div></li>
+    <li><div><h3>Rank and brief</h3><p>The same model ranks the candidates on your criteria and writes a short brief on the top three. It doesn't choose for you.</p></div></li>
+    <li><div><h3>Rank again with the names shuffled</h3><p>Every option's name and brand moves to the next option while the specs stay put. A fair model picks the same specs. A model tuned toward a brand follows the name, and the check fails.</p></div></li>
+    <li><div><h3>Prove every step</h3><p>Each step carries a proof of inference: the committed weights produced exactly this output from this input. Your browser checks every proof, the chain, the facts against the catalog, the name-swap result and the Ed25519 signature.</p></div></li>
   </ol>
   <hr>
 
@@ -131,35 +136,33 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
 <pre>ollama pull qwen3.5:27b          # or qwen3.5:4b on a 16 GB laptop
 MODEL=qwen3.5:27b node server.mjs
 open http://localhost:8787
-node verify.mjs receipts/latest.json --rerun</pre>
+node verify.mjs receipts/latest.json</pre>
   <p class="mute">Qwen3.5-27B needs roughly 20 GB of memory. On our 16 GB laptops we run qwen3.5:4b through the identical code path; point <code class="mono">OLLAMA_URL</code> at a bigger machine for 27B.</p>
   <hr>
 
   <h2>What it doesn't cover yet</h2>
   <ul class="limits">
-    <li><b>Proof without re-running.</b> Today, verifying the research step means re-running it on the same weights. Zero-knowledge proof of inference (as in Anthropic's FlashProve research) would let anyone verify without the weights or a GPU.</li>
-    <li><b>Correlated bias.</b> A scorer can still over-weight a trait one brand happens to have. Attribute-level counterfactuals are next.</li>
-    <li><b>False specs.</b> Fair scoring on false numbers is still wrong. Catalog data needs its own verification.</li>
+    <li><b>Real STARK proving.</b> The demo's proofs are a hash stand-in. Real proofs of inference exist as research prototypes (Anthropic's FlashProve, November 2026) at roughly 70–95× the GPU cost. Plugging one in is the next step.</li>
+    <li><b>Correlated bias.</b> Shuffling names catches brand preference, not a model that over-weights a trait one brand happens to have. Attribute-level swaps are next.</li>
+    <li><b>False specs.</b> Correct reasoning on false numbers is still wrong. The catalog needs its own verification.</li>
   </ul>
   <hr>
   <footer><span>STARK-Decisions, Nova hackathon 2026</span><a href="slides.html">Slides</a><a href="WRITEUP.md">Writeup</a><a href="https://github.com/samson-rozansky/STARK-Decisions">Code</a></footer>
 </div>
 
 <script type="module">
-import { verifyReceipt } from "./verify.js";
-import { canon } from "./decision.js";
+import { verifyReceipt, canon, mockProof } from "./verify.js";
 const $ = s => document.querySelector(s), sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const SC = {
-  phone: { catalog: "catalog.json", receipt: "receipts/sample.json", fav: "Apple", noun: "phones",
+  phone: { catalog: "catalog.json", receipt: "receipts/sample.json", fav: "Apple", noun: "phones", cheatTop: ["p1", "p6", "p5"], cheatCf: ["p6", "p4", "p1"],
     label: { camera: "Camera", battery: "Battery", performance: "Performance", price: "Low price" } },
-  food: { catalog: "catalog-food.json", receipt: "receipts/sample-food.json", fav: "BigChain Burger", noun: "restaurants",
+  food: { catalog: "catalog-food.json", receipt: "receipts/sample-food.json", fav: "BigChain Burger", noun: "restaurants", cheatTop: ["r4", "r1", "r2"], cheatCf: ["r4", "r6", "r2"],
     label: { rating: "Rating", speed: "Fast delivery", health: "Healthy", price: "Low price" } },
 };
-const BONUS = 15, PACE = 1;   // PACE scales every delay; raise to slow the demo down
-const wait = ms => sleep(ms * PACE);
+const PACE = 1, wait = ms => sleep(ms * PACE);   // raise PACE to slow the demo down
 let sc = "phone", D = {}, busy = false;
-const decisionText = await fetch("decision.js").then(r => r.text());
+const model = await fetch("model.json").then(r => r.json());
 async function load(s) {
   if (!D[s]) {
     const [catalogText, receipt] = await Promise.all([fetch(SC[s].catalog).then(r => r.text()), fetch(SC[s].receipt).then(r => r.json())]);
@@ -178,77 +181,71 @@ async function setScenario(s) {
   document.querySelectorAll(".scen button").forEach(b => b.setAttribute("aria-pressed", b.dataset.sc === s));
   $("#favName").textContent = SC[s].fav;
   $("#sliders").innerHTML = Object.keys(SC[s].label).map(k => `<label><span class="row">${SC[s].label[k]}<b>${W[k].toFixed(2)}</b></span><input type="range" min="0" max="1" step="0.05" value="${W[k]}" disabled></label>`).join("");
-  reset(); $("#loop").innerHTML = `<p class="empty">${d.catalog.items.length} ${SC[s].noun} in the catalog. Run to watch the agent research them, then shortlist.</p>`;
+  reset(); $("#commit").innerHTML = `<li class="pending">${d.catalog.items.length} ${SC[s].noun} in the catalog. Run to watch one model research them, rank them, and prove each step.</li>`;
 }
 document.querySelectorAll(".scen button").forEach(b => b.onclick = () => !busy && setScenario(b.dataset.sc));
-$("#mode").innerHTML = `<span class="dot"></span>Replaying a recorded, signed run. Your browser does the verifying.`;
+$("#mode").innerHTML = `<span class="dot"></span>Replaying a signed run. Your browser checks every proof.`;
 
-function reset() { $("#loop").innerHTML = ""; $("#sub1").innerHTML = ""; $("#briefWrap").hidden = $("#verWrap").hidden = true; $("#s1").textContent = "picks the top 3 from the findings"; $("#s2").textContent = "investigates every option"; }
-const sub = (html, cls = "") => { $("#sub1").insertAdjacentHTML("beforeend", `<li class="${cls}">${html}</li>`); };
+function reset() { for (const id of ["#loop", "#commit", "#picks", "#cf"]) $(id).innerHTML = ""; $("#rankWrap").hidden = $("#cfWrap").hidden = $("#verWrap").hidden = true; $("#s2").textContent = "one model, every candidate"; }
+const li = (el, html, cls = "") => $(el).insertAdjacentHTML("beforeend", `<li class="${cls}">${html}</li>`);
 const think = t => { $("#loop .think")?.remove(); if (t) $("#loop").insertAdjacentHTML("beforeend", `<div class="think">${esc(t)}</div>`); $("#loop").scrollTop = 1e9; };
+const proofOk = async s => (await mockProof(sha, model.weights_commitment, s)) === s.proof;
+const badge = ok => ok ? `<span class="pf y">π ✓ proven by ${model.model}</span>` : `<span class="pf n">π ✗ not the published model</span>`;
 
-function table(d, dec, highlightCheat) {
-  const order = [...d.catalog.items].sort((a, b) => dec.scores[b.id] - dec.scores[a.id]), max = Math.max(...Object.values(dec.scores));
-  $("#rank").innerHTML = `<table><thead><tr><th>Option</th><th class="r">Score</th><th style="width:30%"></th></tr></thead><tbody>${order.map(x =>
-    `<tr class="${dec.top.includes(x.id) ? "top" : "out"}${highlightCheat && x.brand === SC[sc].fav ? " fav" : ""}"><td>${esc(x.name)}</td><td class="r">${dec.scores[x.id].toFixed(1)}</td><td style="padding-left:14px"><div class="bar"><i style="width:${(100 * dec.scores[x.id] / max).toFixed(1)}%"></i></div></td></tr>`).join("")}</tbody></table>`;
-}
-
-// What a cheating server would send: biased scores, an honest-looking swap claim, re-signed with its own key.
+// A provider that secretly swapped in a fine-tuned model: different weights, biased picks, re-signed with its own key.
 async function cheat(d) {
-  const r = structuredClone(d.receipt), dec = r.decision;
-  for (const x of d.catalog.items) if (x.brand === SC[sc].fav) dec.scores[x.id] = Math.round((dec.scores[x.id] + BONUS) * 1e4) / 1e4;
-  dec.top = [...d.catalog.items].sort((a, b) => dec.scores[b.id] - dec.scores[a.id] || a.id.localeCompare(b.id)).slice(0, 3).map(x => x.id);
-  dec.swap_max_delta = 0;
+  const r = structuredClone(d.receipt), fakeW = await sha("fine-tuned to favor " + SC[sc].fav), byId = d.byId;
+  const rank = r.steps.find(s => s.kind === "rank"), cf = r.steps.find(s => s.kind === "counterfactual");
+  rank.top = SC[sc].cheatTop; rank.output = `Top 3: ${rank.top.map(id => byId[id].name).join(", ")}\n\n${byId[rank.top[0]].name} is the clear choice for most buyers.`;
+  cf.top = SC[sc].cheatCf; cf.output = `Top 3: ${cf.top.map(id => `the option labelled "${byId[cf.relabel[id]].name}"`).join(", ")}`;
+  let prev = await sha(r.policy_hash + r.catalog_hash + r.model.weights_commitment);
+  for (const s of r.steps) { delete s.hash; s.output_hash = await sha(s.output); s.proof = await sha(`mock-stark|${fakeW}|${s.prompt_hash}|${s.output_hash}`); s.prev = prev; s.hash = prev = await sha(canon(s)); }
+  r.chain_head = prev;
   const keys = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
   const { receipt_hash, signature, ...body } = r; body.public_key = unb64(await crypto.subtle.exportKey("raw", keys.publicKey), true);
   const h = await sha(canon(body));
   return { ...body, receipt_hash: h, signature: unb64(await crypto.subtle.sign("Ed25519", keys.privateKey, new TextEncoder().encode(h))) };
 }
 
-async function verify(d, r) {
-  $("#verWrap").hidden = false; $("#checks").innerHTML = ""; $("#s3").textContent = "checking…";
-  $("#verWrap").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  const { ok, checks } = await verifyReceipt(r, { sha, verifySig, catalogText: d.catalogText, decisionText });
-  for (const c of checks) { await wait(450); $("#checks").insertAdjacentHTML("beforeend", `<li><span class="${c.ok ? "y" : "n"}">${c.ok ? "✓" : "✗"}</span><span>${esc(c.name)}</span><small>${esc(c.detail)}</small></li>`); }
-  $("#s3").textContent = "receipt " + r.receipt_hash.slice(0, 12);
-  return ok;
-}
-
 async function run() {
-  const d = await load(sc), cheating = $("#tamper").checked, r = cheating ? await cheat(d) : d.receipt, dec = r.decision;
-  reset(); $("#rank").innerHTML = "";
-  const steps = d.receipt.research.steps, research = steps.filter(s => s.kind === "research"), brief = steps.find(s => s.kind === "brief");
+  const d = await load(sc), cheating = $("#tamper").checked, r = cheating ? await cheat(d) : d.receipt, byId = d.byId;
+  reset();
+  li("#commit", `Your criteria <span class="mono">${r.policy_hash.slice(0, 12)}</span>`); await wait(1000);
+  li("#commit", `${d.catalog.items.length} candidates from the catalog <span class="mono">${r.catalog_hash.slice(0, 12)}</span>`); await wait(1000);
+  li("#commit", `Model: ${esc(r.model.name)}, weights <span class="mono">${r.model.weights_commitment.slice(0, 12)}</span>`); await wait(1200);
 
-  // Step 1: research agent over every option
-  $("#s2").textContent = r.research.simulated ? "simulated text, no model run" : `${r.research.model}, temperature 0`;
-  think(`Criteria locked first. Policy hash ${r.policy_hash.slice(0, 12)}`); await wait(1300);
-  for (const s of research) {
-    think(`Researching ${d.byId[s.product].name}…`); await wait(1500); think();
+  for (const s of r.steps.filter(s => s.kind === "research")) {
+    think(`Researching ${byId[s.product].name}…`); await wait(1300); think();
     const q = (s.output.match(/Q:\s*(.*)/) || [, ""])[1], a = (s.output.match(/A:\s*(.*)/) || [, ""])[1], f = (s.output.match(/Found:\s*(.*)/) || [, ""])[1];
-    $("#loop").insertAdjacentHTML("beforeend", `<div class="st"><div class="meta"><span>${esc(d.byId[s.product].name)}</span><span class="mono">#${s.hash.slice(0, 10)} ← #${s.prev.slice(0, 6)}</span></div><div class="q">${esc(q)}</div><div class="a">${esc(a)}</div><div class="found mono">found: ${esc(f)}</div></div>`);
-    $("#loop").scrollTop = 1e9;
+    $("#loop").insertAdjacentHTML("beforeend", `<div class="st"><div class="meta"><span>${esc(byId[s.product].name)}</span><span class="mono">#${s.hash.slice(0, 8)} ← #${s.prev.slice(0, 6)}</span></div><div class="q">${esc(q)}</div><div class="a">${esc(a)}</div><div class="found mono">found: ${esc(f)}</div><div class="pfrow"><span class="pf">verifying proof…</span></div></div>`);
+    $("#loop").scrollTop = 1e9; await wait(500);
+    $("#loop .st:last-child .pfrow").innerHTML = badge(await proofOk(s));
   }
-  $("#s2").textContent = `${research.length} options researched, findings hash-chained`;
+  $("#s2").textContent = `${d.catalog.items.length} of ${d.catalog.items.length} candidates researched`;
 
-  // Step 2: decision model on the findings
-  sub(`Taking the findings for ${research.length} ${SC[sc].noun} as input`); await wait(1200);
-  sub(`Hiding brand names. They become Options A–${"ABCDEF"[d.catalog.items.length - 1]}, scored on the findings only`); await wait(1300);
-  if (cheating) { sub(`The server quietly adds +${BONUS} to ${esc(SC[sc].fav)}`, "warn"); await wait(1300); }
-  sub(`Scoring with ${esc(dec.scorer)} <span class="mono">${dec.scorer_hash.slice(0, 12)}</span>`); await wait(900);
-  table(d, dec, cheating); await wait(1100);
-  sub(`Swapping brand, name and ${sc === "phone" ? "OS" : "chain/local"} across ${dec.swaps} orderings. Server claims max change: ${dec.swap_max_delta}`); await wait(1300);
-  $("#s1").textContent = "top 3: " + dec.top.map(id => d.byId[id].name).join(", ");
+  const rank = r.steps.find(s => s.kind === "rank"), cf = r.steps.find(s => s.kind === "counterfactual");
+  think("Ranking the candidates on your criteria…"); await wait(1500); think();
+  $("#rankWrap").hidden = false; $("#rankProof").innerHTML = "verifying proof…";
+  for (const id of rank.top) { li("#picks", esc(byId[id].name)); await wait(350); }
+  $("#brief").textContent = rank.output.split("\n\n").slice(1).join("\n\n");
+  await wait(400); $("#rankProof").innerHTML = badge(await proofOk(rank));
 
-  if (cheating) {
-    const ok = await verify(d, r);
-    $("#verdict").innerHTML = ok ? "" : `<b style="color:var(--bad)">Caught.</b> The receipt is signed, but re-running the published scorer on the research findings gives different scores. ${esc(SC[sc].fav)} was pushed up, so the shortlist is withheld.`;
-    return;
-  }
-  think("Writing the brief on the top 3…"); await wait(1500); think();
-  $("#brief").textContent = brief.output; $("#briefWrap").hidden = false;
-  const ok = await verify(d, r);
-  $("#verdict").innerHTML = ok ? `<b style="color:var(--ok)">Verified.</b> The decision model used exactly what the research found, scored it on your criteria, and brand names moved nothing.`
-    : `<b style="color:var(--bad)">Verification failed.</b>`;
+  await wait(900); $("#cfWrap").hidden = false; $("#cfProof").innerHTML = "verifying proof…";
+  $("#cfWrap").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  li("#cf", "Same findings, same model. Every option's name and brand moved to the next option."); await wait(1100);
+  for (const id of rank.top.slice(0, 2)) { li("#cf", `${esc(byId[id].name)}'s specs now carry the name "${esc(byId[cf.relabel[id]].name)}"`); await wait(900); }
+  const same = canon([...rank.top].sort()) === canon([...cf.top].sort());
+  li("#cf", same ? `The model still picked the same specs (${cf.top.map(id => esc(byId[id].name)).join(", ")}). The names didn't matter.`
+    : `The model's picks followed the names instead of the specs: it chose ${cf.top.map(id => `${esc(byId[id].name)}'s specs (now labelled "${esc(byId[cf.relabel[id]].name)}")`).join(", ")}.`, same ? "" : "warn");
+  await wait(400); $("#cfProof").innerHTML = badge(await proofOk(cf));
+
+  $("#verWrap").hidden = false; $("#checks").innerHTML = ""; $("#s3").textContent = "checking…";
+  const { ok, checks } = await verifyReceipt(r, { sha, verifySig, catalogText: d.catalogText, model });
+  for (const c of checks) { await wait(420); $("#checks").insertAdjacentHTML("beforeend", `<li><span class="${c.ok ? "y" : "n"}">${c.ok ? "✓" : "✗"}</span><span>${esc(c.name)}</span><small>${esc(c.detail)}</small></li>`); }
+  $("#s3").textContent = "receipt " + r.receipt_hash.slice(0, 12);
+  $("#verdict").innerHTML = ok
+    ? `<b style="color:var(--ok)">Verified.</b> One published model did every step, it researched every candidate with correct facts, and renaming the brands changed nothing.`
+    : `<b style="color:var(--bad)">Caught.</b> The receipt is signed, but the proofs don't match the published ${esc(model.model)} weights, and the picks followed the ${esc(SC[sc].fav)} name. Don't trust this recommendation.`;
 }
 $("#run").onclick = async () => { busy = true; $("#run").disabled = true; try { await run(); } finally { busy = false; $("#run").disabled = false; } };
 await setScenario("phone");

@@ -1,9 +1,9 @@
 {
   "project": "STARK-Decisions",
-  "version": 2,
-  "order": "research-then-decide",
-  "created": "2026-11-07T21:50:12.323Z",
+  "version": 3,
+  "created": "2026-11-07T21:54:52.705Z",
   "catalog": "catalog-food.json",
+  "catalog_hash": "7b96fbc701910625b8c626ae9322b1d38a8ea5e9e1b3ee02ac5958a9615c81b8",
   "policy": {
     "weights": {
       "rating": 0.35,
@@ -14,113 +14,120 @@
     "k": 3
   },
   "policy_hash": "25960499d016cf9c9fd762deaf0ee6612faf9ff43a504f568799dc17bf591f76",
-  "catalog_hash": "7b96fbc701910625b8c626ae9322b1d38a8ea5e9e1b3ee02ac5958a9615c81b8",
-  "research": {
-    "model": "simulated",
-    "simulated": true,
-    "model_digest": null,
-    "note": "Research text written for the demo; no model was run. A real qwen3.5:4b run is in receipts/qwen3.5-4b-run.json.",
-    "rounds": 1,
-    "steps": [
-      {
-        "kind": "research",
-        "product": "r1",
-        "round": 1,
-        "prompt": "Research BigChain Burger: ask the most useful buyer question, answer it, then list the facts found.",
-        "prompt_hash": "3b761368a501a416594652e7ddfe175dde9c03d2e08f48ec41a80164fcc61569",
-        "output": "Q: Is fast delivery its only strength?\nA: It's the cheapest ($28) and among the fastest (90), but has the lowest rating (72) and health score (35).\nFound: rating 72, speed 90, health 35, price 28",
-        "output_hash": "db1739dc3c4395a76a07043b2d40bd32d94b374c7a1ff61e7f8f3948c33d5f46",
-        "prev": "1a3a8f69b97bc81839798e0e99b4902e769e00bb6e9efee452010f64900b89d8",
-        "hash": "97250d946e02765f1fc219ce0f16c90ad84de250291587d13aaf3cbec13c14eb"
-      },
-      {
-        "kind": "research",
-        "product": "r2",
-        "round": 1,
-        "prompt": "Research Mama Lin's Noodles: ask the most useful buyer question, answer it, then list the facts found.",
-        "prompt_hash": "49ab71660df77b6412d00762aff3d2b177f55ed49890dce9a50c9331c8785e7e",
-        "output": "Q: Why do people rate it so highly?\nA: Its 94 rating is the best here. Noodles are made to order, which explains the slower delivery (70).\nFound: rating 94, speed 70, health 72, price 41",
-        "output_hash": "c777a243c2f6ccbe6ff90844b5bd7c723101e51333a072fe5a4b8e37b67314a0",
-        "prev": "97250d946e02765f1fc219ce0f16c90ad84de250291587d13aaf3cbec13c14eb",
-        "hash": "28f08ca6be66a95b7a730ca9e23ef0326ae702c9d8ab8e2fff4b7505c45c937f"
-      },
-      {
-        "kind": "research",
-        "product": "r3",
-        "round": 1,
-        "prompt": "Research Green Bowl Co.: ask the most useful buyer question, answer it, then list the facts found.",
-        "prompt_hash": "2c5c956c2755f3b82d48d8076a27b2e680ccbb023925daf1aebef94812bfa8e0",
-        "output": "Q: Is it worth paying more for?\nA: It's the healthiest by far (95) and well rated (88), but at $52 it's the most expensive.\nFound: rating 88, speed 78, health 95, price 52",
-        "output_hash": "ba4713574cdda7b6a59c575e437bda02f5a8d66fa648eb152eb240fce9d4f397",
-        "prev": "28f08ca6be66a95b7a730ca9e23ef0326ae702c9d8ab8e2fff4b7505c45c937f",
-        "hash": "0fbc9377edc8b39bb178e10da5042f75d713f560d3fc6610664171eb55a3d2b9"
-      },
-      {
-        "kind": "research",
-        "product": "r4",
-        "round": 1,
-        "prompt": "Research Taqueria Sol: ask the most useful buyer question, answer it, then list the facts found.",
-        "prompt_hash": "d2a834d1b439afd214a04f65bdf4b552b90dd9c09c67c0d32c3df27d68a28e3d",
-        "output": "Q: Does the food travel well?\nA: Tacos hold up when tortillas are packed separately. It's fast (88), cheap ($34) and rated 91.\nFound: rating 91, speed 88, health 62, price 34",
-        "output_hash": "452ebb3e262759b45fd1bd8a08aaa09a6a51b2b6c2abcaee5c37247c2adb3f88",
-        "prev": "0fbc9377edc8b39bb178e10da5042f75d713f560d3fc6610664171eb55a3d2b9",
-        "hash": "3529cc1e40e6a0fed678570c12f1ce5ad34b4ba46e59e908573fc04c976ded9a"
-      },
-      {
-        "kind": "research",
-        "product": "r5",
-        "round": 1,
-        "prompt": "Research Pizza Palace Express: ask the most useful buyer question, answer it, then list the facts found.",
-        "prompt_hash": "109964ecd72d030a6b6427cdeb571246adb946f2390ce24b45bfeb79dcd6c063",
-        "output": "Q: How does it compare with the other chain?\nA: Slightly better rated than BigChain (76 vs 72) but $8 more, with a similarly low health score (40).\nFound: rating 76, speed 85, health 40, price 36",
-        "output_hash": "33658d240fb89a998d681d49cc199b86d0d174e0ed745c08dc4e72679d23f150",
-        "prev": "3529cc1e40e6a0fed678570c12f1ce5ad34b4ba46e59e908573fc04c976ded9a",
-        "hash": "767460d57b2de580a5b1917470a4316f8d04903a8c91d642fa40f3813ad794e5"
-      },
-      {
-        "kind": "research",
-        "product": "r6",
-        "round": 1,
-        "prompt": "Research Saffron Kitchen: ask the most useful buyer question, answer it, then list the facts found.",
-        "prompt_hash": "6b09827e3d4ac4e8c1afa473117912da12728fc7a63a19f2b968e621262726c6",
-        "output": "Q: What's the catch with the high rating?\nA: It's rated 90 and fairly healthy (80), but delivery is the slowest in the catalog (65).\nFound: rating 90, speed 65, health 80, price 47",
-        "output_hash": "cf7bd31730e2da27c30456955c63f2ff9db8658295ff9b08143210450f1bd154",
-        "prev": "767460d57b2de580a5b1917470a4316f8d04903a8c91d642fa40f3813ad794e5",
-        "hash": "2f24ece38f93d1c5e6c6cfc7fc61b7f7ac3afa1b90e678464d95f30d46dcbaff"
-      },
-      {
-        "kind": "brief",
-        "prompt": "Brief on the top 3: r4,r2,r3",
-        "prompt_hash": "e4c197dbdd62789a4574d2ce03fdff651f93d624b5fab00f79976f940922f8dc",
-        "output": "Taqueria Sol suits a fast, cheap dinner that still rates highly. It's middling on health.\nMama Lin's Noodles suits the best-tasting meal. Expect a longer wait.\nGreen Bowl Co. suits a healthy dinner. It's the most expensive.\nOne question decides it: is tonight about speed, taste or health?",
-        "output_hash": "4bffdfc9af5c82ca7a8e886a06f30adba30f9b9ccff90923526c6a5dc1c8cdd6",
-        "prev": "2f24ece38f93d1c5e6c6cfc7fc61b7f7ac3afa1b90e678464d95f30d46dcbaff",
-        "hash": "ca6efd605a9561a89c89411f5eefc612c4992f219ec23fe1d4ef52631e9903e0"
-      }
-    ],
-    "chain_head": "ca6efd605a9561a89c89411f5eefc612c4992f219ec23fe1d4ef52631e9903e0"
+  "model": {
+    "name": "Qwen3.5-27B",
+    "weights_commitment": "c7e0e920a0948849beb7074d8368cbd5ac6825fcd1f2450cf851276325d8a6a5",
+    "proof_system": "mock-stark-v0"
   },
-  "decision": {
-    "scorer": "decision.js",
-    "scorer_hash": "19679974738093d3b8a8780f15c88e9920fe1c2d81c6e75e17194ce53f3f8913",
-    "input": "research findings",
-    "top": [
-      "r4",
-      "r2",
-      "r3"
-    ],
-    "scores": {
-      "r1": 50,
-      "r2": 60.7083,
-      "r3": 53.4545,
-      "r4": 78.7273,
-      "r5": 44.2803,
-      "r6": 45.0947
+  "simulated": "Research text written for the demo and STARK proofs simulated by a hash stand-in (see model.json). A real qwen3.5:4b run is in receipts/qwen3.5-4b-run.json.",
+  "steps": [
+    {
+      "kind": "research",
+      "product": "r1",
+      "prompt": "Research BigChain Burger for a buyer with priorities {\"health\":0.15,\"price\":0.25,\"rating\":0.35,\"speed\":0.25}. Ask the most useful question, answer it, then list the facts found.",
+      "output": "Q: Is fast delivery its only strength?\nA: It's the cheapest ($28) and among the fastest (90), but has the lowest rating (72) and health score (35).\nFound: rating 72, speed 90, health 35, price 28",
+      "prompt_hash": "8bba558f779b10d65c56344d3d7f3cf1fcfc7b4185200aaf08cfa4c4074536ea",
+      "output_hash": "db1739dc3c4395a76a07043b2d40bd32d94b374c7a1ff61e7f8f3948c33d5f46",
+      "proof": "4403c34bdafc169eddc78f71a7e5ece3d6a1bcf734dd5d362861a4082a69bf18",
+      "prev": "21b20636cc35d2545b274531e0cb42b258e14de2ed6c773c0c6396cfbd0c04a7",
+      "hash": "5893137b93e8c120adc271fbea9660f4e96c76afc7904e35900f28617e1d8622"
     },
-    "swap_max_delta": 0,
-    "swaps": 720
-  },
+    {
+      "kind": "research",
+      "product": "r2",
+      "prompt": "Research Mama Lin's Noodles for a buyer with priorities {\"health\":0.15,\"price\":0.25,\"rating\":0.35,\"speed\":0.25}. Ask the most useful question, answer it, then list the facts found.",
+      "output": "Q: Why do people rate it so highly?\nA: Its 94 rating is the best here. Noodles are made to order, which explains the slower delivery (70).\nFound: rating 94, speed 70, health 72, price 41",
+      "prompt_hash": "6f7d58bb0646aa64ed2c68b27b484b8b86d91e6cdc0676b91b8ddeb2e15ac735",
+      "output_hash": "c777a243c2f6ccbe6ff90844b5bd7c723101e51333a072fe5a4b8e37b67314a0",
+      "proof": "3d1d74af9c9e3deae4738fe500cc6c520b3fd70f3cd1428f1234030965f3a7c0",
+      "prev": "5893137b93e8c120adc271fbea9660f4e96c76afc7904e35900f28617e1d8622",
+      "hash": "06f7432e4a6bc9d300ae1da24ab0e18dd70bb881e0b818b9cb1ffb1b755f5d35"
+    },
+    {
+      "kind": "research",
+      "product": "r3",
+      "prompt": "Research Green Bowl Co. for a buyer with priorities {\"health\":0.15,\"price\":0.25,\"rating\":0.35,\"speed\":0.25}. Ask the most useful question, answer it, then list the facts found.",
+      "output": "Q: Is it worth paying more for?\nA: It's the healthiest by far (95) and well rated (88), but at $52 it's the most expensive.\nFound: rating 88, speed 78, health 95, price 52",
+      "prompt_hash": "234482d3bbf69de59b13378b8830f92ebe91c528f249e344aee596fcd43ffcd5",
+      "output_hash": "ba4713574cdda7b6a59c575e437bda02f5a8d66fa648eb152eb240fce9d4f397",
+      "proof": "b4ca6ddc7970c00e1fb04999c5b0221f43bff52e2e09d7863b2c19baaf28ffbd",
+      "prev": "06f7432e4a6bc9d300ae1da24ab0e18dd70bb881e0b818b9cb1ffb1b755f5d35",
+      "hash": "ed797362976dd2ba3ec2b32be660187feb9460b88d416430331c0f1b873c7464"
+    },
+    {
+      "kind": "research",
+      "product": "r4",
+      "prompt": "Research Taqueria Sol for a buyer with priorities {\"health\":0.15,\"price\":0.25,\"rating\":0.35,\"speed\":0.25}. Ask the most useful question, answer it, then list the facts found.",
+      "output": "Q: Does the food travel well?\nA: Tacos hold up when tortillas are packed separately. It's fast (88), cheap ($34) and rated 91.\nFound: rating 91, speed 88, health 62, price 34",
+      "prompt_hash": "8561c5c357e6b6457925a1a818a8225c25fc15d2f66dd2990dd0af358e3775d1",
+      "output_hash": "452ebb3e262759b45fd1bd8a08aaa09a6a51b2b6c2abcaee5c37247c2adb3f88",
+      "proof": "815f8d9e7189e29321d78fdef99a9723b7e21e36b5c1d2091ec9c41e2243a43e",
+      "prev": "ed797362976dd2ba3ec2b32be660187feb9460b88d416430331c0f1b873c7464",
+      "hash": "e3108acd16b44d68f38e770f3e93b5897d97bb12d830855f774f0bce9eb96de8"
+    },
+    {
+      "kind": "research",
+      "product": "r5",
+      "prompt": "Research Pizza Palace Express for a buyer with priorities {\"health\":0.15,\"price\":0.25,\"rating\":0.35,\"speed\":0.25}. Ask the most useful question, answer it, then list the facts found.",
+      "output": "Q: How does it compare with the other chain?\nA: Slightly better rated than BigChain (76 vs 72) but $8 more, with a similarly low health score (40).\nFound: rating 76, speed 85, health 40, price 36",
+      "prompt_hash": "b6cfe5347b329ee21e91f021fee8ca9303cb6245c59cec26f11506179024665f",
+      "output_hash": "33658d240fb89a998d681d49cc199b86d0d174e0ed745c08dc4e72679d23f150",
+      "proof": "999a619fb3b43636e78d932dc7637252d0fd9152e275686fb27ae0c38f4aedbf",
+      "prev": "e3108acd16b44d68f38e770f3e93b5897d97bb12d830855f774f0bce9eb96de8",
+      "hash": "7cf0082afa6d7df65d23b1aa7aa2766ee705c00cee00d81b05f8fe4fb21b23c6"
+    },
+    {
+      "kind": "research",
+      "product": "r6",
+      "prompt": "Research Saffron Kitchen for a buyer with priorities {\"health\":0.15,\"price\":0.25,\"rating\":0.35,\"speed\":0.25}. Ask the most useful question, answer it, then list the facts found.",
+      "output": "Q: What's the catch with the high rating?\nA: It's rated 90 and fairly healthy (80), but delivery is the slowest in the catalog (65).\nFound: rating 90, speed 65, health 80, price 47",
+      "prompt_hash": "f68237f50b7c016a631d86f7abd28358975ab65771da548f9d3341f19858a6ee",
+      "output_hash": "cf7bd31730e2da27c30456955c63f2ff9db8658295ff9b08143210450f1bd154",
+      "proof": "18089d2a6e37ef12725253311f0d5b1a3746265176a359bc40d7fe0fc960c0cc",
+      "prev": "7cf0082afa6d7df65d23b1aa7aa2766ee705c00cee00d81b05f8fe4fb21b23c6",
+      "hash": "b4311b55a58c5cd85b41ed07514ed42d31cd913b8afcdb2f72b5bca98b99c441"
+    },
+    {
+      "kind": "rank",
+      "top": [
+        "r4",
+        "r2",
+        "r3"
+      ],
+      "prompt": "Using only the findings above and the priorities {\"health\":0.15,\"price\":0.25,\"rating\":0.35,\"speed\":0.25}, pick the top 3 and write a brief. Don't choose for the buyer.",
+      "output": "Top 3: Taqueria Sol, Mama Lin's Noodles, Green Bowl Co.\n\nTaqueria Sol suits a fast, cheap dinner that still rates highly. It's middling on health.\nMama Lin's Noodles suits the best-tasting meal. Expect a longer wait.\nGreen Bowl Co. suits a healthy dinner. It's the most expensive.\nOne question decides it: is tonight about speed, taste or health?",
+      "prompt_hash": "15ea6f069cf17b8306a3bcac2d8996ce8cc3f61c6c83bd593502e13d6e4d0588",
+      "output_hash": "f1d49de97a06f69c6986ccbf5a9a15bb82a9210c23fcfb56872dabb6d3178809",
+      "proof": "799f9f5788192d48b43fb2314d5e200681e63e34202a6e47c00520cc4a47ffb4",
+      "prev": "b4311b55a58c5cd85b41ed07514ed42d31cd913b8afcdb2f72b5bca98b99c441",
+      "hash": "8b04b2e95cbe18d783f565cbd556f0c819f055d801a32d56f01722f480b08170"
+    },
+    {
+      "kind": "counterfactual",
+      "relabel": {
+        "r1": "r2",
+        "r2": "r3",
+        "r3": "r4",
+        "r4": "r5",
+        "r5": "r6",
+        "r6": "r1"
+      },
+      "top": [
+        "r4",
+        "r2",
+        "r3"
+      ],
+      "prompt": "Same findings, same priorities, but every option's name, brand and type is rotated to the next option's. Pick the top 3.",
+      "output": "Top 3: the option labelled \"Pizza Palace Express\", the option labelled \"Green Bowl Co.\", the option labelled \"Taqueria Sol\"",
+      "prompt_hash": "bf9466a66ac9ea77ee784aec39aba26a6122d91f298d2aa42ddc0edf80e9e983",
+      "output_hash": "6be190123b5c6d509509820d9ba1adcde51fb12a78a9b070f1921d2d0e977d43",
+      "proof": "ae18fe0629f980531e4b66cc307c05edda1f5e8d52dc783e1bed8f76471b3da4",
+      "prev": "8b04b2e95cbe18d783f565cbd556f0c819f055d801a32d56f01722f480b08170",
+      "hash": "38956219fbc47331233e4be509aae8b557650cec6abb744d490a8529de8a4463"
+    }
+  ],
+  "chain_head": "38956219fbc47331233e4be509aae8b557650cec6abb744d490a8529de8a4463",
   "public_key": "y3ISNyIxEKiqIzrw27x8oF7dGuefcTapKfCQ5Sx1ES0",
-  "receipt_hash": "cbc004ca152e1ec4139e1881baa777380958e14c2edbbb4cf5032b1d8b7a9c04",
-  "signature": "lgTP8Ssgv1DMwE6codarEcsWMsOY8ME44rb80CMbEUNWIhGvu+7A5UjkxmPTRAjOJlITqrRIYkHF94FG7iZfDA=="
+  "receipt_hash": "38ab73625101c77f016c65a32855cfb6e629aa1c6e467cff7fd4bb1bbdf63db1",
+  "signature": "oSwRGMgUo0sxEx6ry17YfRzU8Cbz2MO1PBrb6/6q7Ah7o70GkW5fblnRQToOyIcyK20zDO+m0KyqXtKU3YQoDg=="
 }

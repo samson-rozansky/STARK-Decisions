@@ -1,0 +1,9 @@
+{
+  "model": "Qwen3.5-27B",
+  "ollama_tag": "qwen3.5:27b",
+  "weights_commitment": "c7e0e920a0948849beb7074d8368cbd5ac6825fcd1f2450cf851276325d8a6a5",
+  "weights_size_bytes": 16547399008,
+  "source": "sha256 of the model weights layer in registry.ollama.ai/v2/library/qwen3.5/manifests/27b",
+  "proof_system": "mock-stark-v0",
+  "proof_note": "Demo stand-in: proof = sha256('mock-stark|' + weights_commitment + '|' + prompt_hash + '|' + output_hash). The design replaces this with a zkSTARK proof of inference (FlashProve-style) that the committed weights produced the output."
+}

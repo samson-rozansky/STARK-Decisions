@@ -1,18 +1,18 @@
-// STARK-Decisions server: Qwen research loop over all items -> decision model -> top 3 -> brief -> signed receipt.
+// STARK-Decisions server: one LLM researches every candidate, ranks top 3, counterfactual re-rank; every step carries a (simulated) proof; signed receipt.
 // Run:  node server.mjs        (needs Ollama running with $MODEL pulled)
-// Env:  MODEL=qwen3.5:27b  OLLAMA_URL=http://host:11434  ROUNDS=2  PORT=8787
+// Env:  MODEL=qwen3.5:27b  OLLAMA_URL=http://host:11434  PORT=8787
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { decide, canon, K } from "./decision.js";
+import { canon } from "./verify.js";
+const K = 3;
 
 const DIR = path.dirname(new URL(import.meta.url).pathname);
 const MODEL = process.env.MODEL || "qwen3.5:4b";
 const OLLAMA = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
-const ROUNDS = +(process.env.ROUNDS || 2);
 const PORT = +(process.env.PORT || 8787);
-const OPTIONS = { temperature: 0, seed: 42, num_predict: 220 }; // greedy: reproducible, and what provable inference assumes
+const OPTIONS = { temperature: 0, seed: 42, num_predict: 400 }; // greedy: reproducible, and what provable inference assumes
 
 const sha = s => crypto.createHash("sha256").update(s).digest("hex");
 const read = f => fs.readFileSync(path.join(DIR, f), "utf8");
@@ -27,8 +27,10 @@ const priv = crypto.createPrivateKey(read(".keys/ed25519.pem"));
 const PUB = crypto.createPublicKey(priv).export({ format: "jwk" }).x; // raw key, base64url
 fs.writeFileSync(path.join(DIR, "public-key.txt"), PUB + "\n");
 
-async function modelDigest() {
-  const r = await fetch(OLLAMA + "/api/tags").then(r => r.json());
+async function weightsCommitment() {
+  const mj = JSON.parse(read("model.json"));
+  if (MODEL === mj.ollama_tag) return mj.weights_commitment; // published sha256 of the Qwen3.5-27B weights layer
+  const r = await fetch(OLLAMA + "/api/tags").then(r => r.json()); // local run: Ollama digest of the running model
   const m = r.models.find(m => m.name === MODEL || m.model === MODEL);
   if (!m) throw new Error(`model ${MODEL} not found in Ollama; run: ollama pull ${MODEL}`);
   return m.digest;
@@ -40,63 +42,71 @@ async function ask(prompt) {
   return (await r.json()).message.content.trim();
 }
 
-const facts = (x, cat) => cat.attributes.map(a => `${a}: ${a === "price" ? "$" + x[a] : x[a] + "/100"}`).join(", ");
+const facts = (x, cat) => cat.attributes.map(a => `${a} ${a === "price" ? "$" + x[a] : x[a]}`).join(", ");
+const foundLine = out => (out.match(/^Found:\s*(.*)$/m) || [, ""])[1].trim();
+// ponytail: simulated proof; real zkSTARK proving (FlashProve-style) replaces this one function
+const proof = (wc, ph, oh) => sha("mock-stark|" + wc + "|" + ph + "|" + oh);
+function parseTop(out, ids) {
+  const line = (out.match(/Top\s*3\s*:\s*(.*)/i) || [, ""])[1];
+  const top = []; for (const t of line.match(/\bp?\w+\b/g) || []) if (ids.includes(t) && !top.includes(t)) top.push(t);
+  return top.slice(0, K);
+}
 
-async function pipeline(weights, tamper, emit) {
-  const catalogText = read("catalog.json"), catalog = JSON.parse(catalogText);
-  const policy = { weights, k: K };
+async function pipeline(weights, emit) {
+  const catalogText = read("catalog.json"), catalog = JSON.parse(catalogText), items = catalog.items, ids = items.map(i => i.id);
+  const policy = { weights, k: K }, policy_hash = sha(canon(policy)), catalog_hash = sha(catalogText);
+  const wc = await weightsCommitment();
+  const steps = []; let prev = sha(policy_hash + catalog_hash + wc);
+  const record = async (s, prompt) => {
+    const out = await ask(prompt);
+    Object.assign(s, { prompt, prompt_hash: sha(prompt), output: out, output_hash: sha(out) });
+    if (s.kind !== "research") s.top = parseTop(out, ids);
+    s.proof = proof(wc, s.prompt_hash, s.output_hash);
+    s.prev = prev; s.hash = prev = sha(canon(s)); steps.push(s); emit({ type: "step", step: s });
+    return s;
+  };
 
-  // Step 1: research loop over EVERY catalog item. Every step is hash-chained.
-  const digest = await modelDigest();
-  const steps = []; let prev = sha(canon(policy) + sha(catalogText));
-  const record = (s) => { s.prev = prev; s.hash = prev = sha(canon(s)); steps.push(s); emit({ type: "step", step: s }); };
-  const notes = {};
-  for (const x of catalog.items) {
-    const id = x.id; notes[id] = [];
-    for (let r = 1; r <= ROUNDS; r++) {
-      const prompt = `You are a neutral product researcher. Product: ${x.name}. Spec sheet: ${facts(x, catalog)}.
+  // 1) research EVERY candidate
+  const found = {};
+  for (const x of items) {
+    const s = await record({ kind: "research", product: x.id }, `You are a neutral product researcher. Product: ${x.name}. Spec sheet: ${facts(x, catalog)}.
 Buyer priorities (weights): ${canon(weights)}.
-Notes so far: ${notes[id].join(" | ") || "none"}.
-Ask the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.
+Ask the single most useful question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet. Do not praise or criticize the brand itself.
 Reply exactly as:
 Q: <question>
 A: <answer>
 Found: <attr> <value>, <attr> <value>, ...
-End with the Found line, restating the spec-sheet numbers you used.`;
-      const out = await ask(prompt);
-      notes[id].push(out.replace(/\s+/g, " "));
-      record({ kind: "research", product: id, round: r, prompt, prompt_hash: sha(prompt), output: out, output_hash: sha(out) });
-    }
+End with the Found line, restating the spec-sheet numbers you used.`);
+    found[x.id] = foundLine(s.output);
   }
 
-  // Step 2: decision model on the catalog. In tamper mode the server secretly favors a brand but still claims the honest scorer.
-  const decision = decide(catalog, policy, tamper ? "Apple" : null);
-  if (tamper) decision.swap_max_delta = 0; // a cheating server would also lie about its swap test
-  emit({ type: "decision", decision, items: catalog.items });
+  // 2) rank: same model picks the top 3
+  const list = (name) => items.map(x => `- ${x.id}: ${name(x)}. Findings: ${found[x.id]}`).join("\n");
+  const rankPrompt = (name) => `You are a neutral shopping assistant. Buyer priorities (weights): ${canon(weights)}.
+Researched options:
+${list(name)}
+Pick the best 3 for these priorities using the findings. First line exactly: Top 3: id, id, id
+Then a short brief: for each pick, who it suits and one trade-off.`;
+  await record({ kind: "rank" }, rankPrompt(x => `${x.name} (${x.brand}, ${x.os})`));
 
-  const finalPrompt = `You are a neutral shopping assistant. The buyer's priorities: ${canon(weights)}.
-Shortlist (researched, then scored by an audited decision model) with research notes:
-${decision.top.map(id => { const x = catalog.items.find(i => i.id === id); return `- ${x.name} (${facts(x, catalog)}): ${notes[id].join(" ")}`; }).join("\n")}
-Write a short brief: for each option, one line on who it suits best and one trade-off. Do not pick for the buyer; end with one sentence on what single factor should decide it.`;
-  const brief = await ask(finalPrompt);
-  record({ kind: "brief", prompt: finalPrompt, prompt_hash: sha(finalPrompt), output: brief, output_hash: sha(brief) });
+  // 3) counterfactual: option i carries option i+1's name/brand/os, specs unchanged
+  const relabel = {}; items.forEach((x, i) => relabel[x.id] = items[(i + 1) % items.length].id);
+  const byId = Object.fromEntries(items.map(x => [x.id, x]));
+  await record({ kind: "counterfactual", relabel }, rankPrompt(x => { const y = byId[relabel[x.id]]; return `${y.name} (${y.brand}, ${y.os})`; }));
 
-  // Signed receipt
   const body = {
-    project: "STARK-Decisions", version: 1, created: new Date().toISOString(),
-    policy, policy_hash: sha(canon(policy)),
-    catalog: "catalog.json", catalog_hash: sha(catalogText),
-    decision: { scorer: "decision.js", scorer_hash: sha(read("decision.js")), ...decision },
-    research: { model: MODEL, model_digest: digest, options: OPTIONS, rounds: ROUNDS, steps, chain_head: prev },
-    public_key: PUB,
+    project: "STARK-Decisions", version: 3, created: new Date().toISOString(),
+    catalog: "catalog.json", catalog_hash, policy, policy_hash,
+    model: { name: MODEL, weights_commitment: wc, proof_system: "mock-stark-v0" },
+    steps, chain_head: prev, public_key: PUB,
   };
   const receipt_hash = sha(canon(body));
   const signature = crypto.sign(null, Buffer.from(receipt_hash), priv).toString("base64");
   return { ...body, receipt_hash, signature };
 }
 
-const STATIC = { "/": "index.html", "/index.html": "index.html", "/decision.js": "decision.js", "/catalog.json": "catalog.json",
-  "/receipts/sample.json": "receipts/sample.json", "/WRITEUP.md": "WRITEUP.md", "/slides.html": "slides.html", "/public-key.txt": "public-key.txt" };
+const STATIC = { "/": "index.html", "/index.html": "index.html", "/catalog.json": "catalog.json", "/catalog-food.json": "catalog-food.json", "/model.json": "model.json", "/verify.js": "verify.js",
+  "/receipts/sample.json": "receipts/sample.json", "/receipts/sample-food.json": "receipts/sample-food.json", "/receipts/qwen3.5-4b-run.json": "receipts/qwen3.5-4b-run.json", "/WRITEUP.md": "WRITEUP.md", "/slides.html": "slides.html", "/public-key.txt": "public-key.txt" };
 const TYPES = { html: "text/html", js: "text/javascript", json: "application/json", md: "text/markdown", txt: "text/plain" };
 
 http.createServer(async (req, res) => {
@@ -110,9 +120,9 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { "content-type": "application/x-ndjson" });
     const emit = o => res.write(JSON.stringify(o) + "\n");
     try {
-      const receipt = await pipeline(weights, !!input.tamper, emit);
+      const receipt = await pipeline(weights, emit);
       emit({ type: "receipt", receipt });
-      if (!input.tamper) fs.mkdirSync(path.join(DIR, "receipts"), { recursive: true }), fs.writeFileSync(path.join(DIR, "receipts/latest.json"), JSON.stringify(receipt, null, 2));
+      fs.mkdirSync(path.join(DIR, "receipts"), { recursive: true }), fs.writeFileSync(path.join(DIR, "receipts/latest.json"), JSON.stringify(receipt, null, 2));
     } catch (e) { emit({ type: "error", message: String(e.message || e) }); }
     return res.end();
   }

@@ -186,70 +186,69 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
     </div>
     <div class="col">
       <h3>Checked for fairness</h3>
-      <p>Brands are hidden while scoring, and an identity-swap test checks that names don't move scores. Every step is in a signed receipt.</p>
+      <p>The same model re-ranks with brand names rotated between options. If the picks follow the specs, names didn't matter. Every step is in a signed receipt.</p>
     </div>
     <div class="col">
       <h3>Your choice</h3>
-      <p>The agent researches every option, scores them, and shortlists three with a short brief. You decide.</p>
+      <p>One model researches every option, ranks them, and shortlists three with a short brief. You decide.</p>
     </div>
   </div>
 </section>
 
 <!-- 7 -->
 <section class="slide" data-title="How it works">
-  <h2 style="margin-bottom:32px">Two steps, one receipt.</h2>
+  <h2 style="margin-bottom:32px">One model, three checks, one receipt.</h2>
   <figure>
-  <svg viewBox="0 0 1280 440" width="100%" role="img" aria-label="Pipeline: a research loop studies every option and extracts the facts as numbers, a deterministic decision model scores them on the committed criteria and picks a top three, and everything is hashed into a signed receipt; both models are designed to get a zero-knowledge proof">
+  <svg viewBox="0 0 1280 440" width="100%" role="img" aria-label="Pipeline: one open-weights model researches every option, ranks them and picks a top three, then re-ranks with brand names rotated as a counterfactual check; every step carries a STARK proof of inference against the published weights commitment (simulated in the demo), and everything is hashed into a signed receipt">
     <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#262722"/></marker></defs>
     <g font-family="Source Serif 4, Georgia, serif" fill="#262722">
-      <!-- criteria -->
       <rect x="0" y="40" width="200" height="190" fill="#f7f6f2" stroke="#dcdad2"/>
       <text x="20" y="80" font-size="24" font-weight="600">Your criteria</text>
       <text x="20" y="116" font-size="19" fill="#6b6b62">price, battery,</text>
       <text x="20" y="142" font-size="19" fill="#6b6b62">camera, ETA</text>
       <text x="20" y="200" font-size="17" fill="#6b6b62" font-family="ui-monospace,Menlo,monospace">commit = sha256</text>
-      <line x1="200" y1="135" x2="252" y2="135" stroke="#262722" marker-end="url(#ar)"/>
+      <line x1="200" y1="135" x2="232" y2="135" stroke="#262722" marker-end="url(#ar)"/>
 
-      <!-- step 1 -->
-      <rect x="260" y="20" width="370" height="230" fill="#f7f6f2" stroke="#262722"/>
-      <text x="284" y="60" font-size="18" fill="#6b6b62">Step 1</text>
-      <text x="284" y="92" font-size="26" font-weight="600">Research loop</text>
-      <text x="284" y="128" font-size="19">Qwen3.5-27B, open weights</text>
-      <text x="284" y="160" font-size="19" fill="#6b6b62">Every option, facts as numbers</text>
-      <text x="284" y="188" font-size="19" fill="#6b6b62">question → finding, in rounds</text>
-      <text x="284" y="216" font-size="19" fill="#6b6b62">Temperature 0</text>
-      <text x="284" y="240" font-size="19" fill="#6b6b62">Each step hashed into a chain</text>
-      <line x1="630" y1="135" x2="682" y2="135" stroke="#262722" marker-end="url(#ar)"/>
-      <text x="636" y="122" font-size="17" fill="#d9683b">facts</text>
+      <rect x="240" y="20" width="270" height="230" fill="#f7f6f2" stroke="#262722"/>
+      <text x="260" y="58" font-size="18" fill="#6b6b62">Qwen3.5-27B</text>
+      <text x="260" y="92" font-size="26" font-weight="600">1 Research</text>
+      <text x="260" y="128" font-size="19">Every option in the</text>
+      <text x="260" y="154" font-size="19">committed catalog</text>
+      <text x="260" y="190" font-size="19" fill="#6b6b62">Found: line must match</text>
+      <text x="260" y="216" font-size="19" fill="#6b6b62">the catalog</text>
+      <line x1="510" y1="135" x2="542" y2="135" stroke="#262722" marker-end="url(#ar)"/>
 
-      <!-- step 2 -->
-      <rect x="690" y="20" width="350" height="230" fill="#f7f6f2" stroke="#262722"/>
-      <text x="714" y="60" font-size="18" fill="#6b6b62">Step 2</text>
-      <text x="714" y="92" font-size="26" font-weight="600">Decision model</text>
-      <text x="714" y="128" font-size="19">Small, open, deterministic scorer</text>
-      <text x="714" y="160" font-size="19" fill="#6b6b62">Brand names hidden</text>
-      <text x="714" y="188" font-size="19" fill="#6b6b62">Scored on your criteria</text>
-      <text x="714" y="216" font-size="19" fill="#6b6b62">Identity swap: any score moves?</text>
-      <text x="714" y="240" font-size="19" fill="#b4442c">  → bias flagged</text>
-      <line x1="1040" y1="135" x2="1092" y2="135" stroke="#262722" marker-end="url(#ar)"/>
-      <text x="1046" y="122" font-size="17" fill="#d9683b">top 3</text>
+      <rect x="550" y="20" width="270" height="230" fill="#f7f6f2" stroke="#262722"/>
+      <text x="570" y="58" font-size="18" fill="#6b6b62">Same model</text>
+      <text x="570" y="92" font-size="26" font-weight="600">2 Rank</text>
+      <text x="570" y="128" font-size="19">Top 3 plus a short</text>
+      <text x="570" y="154" font-size="19">brief, from the findings</text>
+      <text x="570" y="190" font-size="19" fill="#6b6b62">Temperature 0</text>
+      <line x1="820" y1="135" x2="852" y2="135" stroke="#262722" marker-end="url(#ar)"/>
 
-      <!-- you -->
-      <rect x="1100" y="40" width="180" height="190" fill="#f7f6f2" stroke="#dcdad2"/>
-      <text x="1120" y="80" font-size="24" font-weight="600">You choose</text>
-      <text x="1120" y="116" font-size="19" fill="#6b6b62">3 options,</text>
-      <text x="1120" y="142" font-size="19" fill="#6b6b62">each explained</text>
+      <rect x="860" y="20" width="240" height="230" fill="#f7f6f2" stroke="#262722"/>
+      <text x="880" y="58" font-size="18" fill="#6b6b62">Same model</text>
+      <text x="880" y="92" font-size="26" font-weight="600">3 Name swap</text>
+      <text x="880" y="128" font-size="19">Names rotated</text>
+      <text x="880" y="154" font-size="19">between options</text>
+      <text x="880" y="190" font-size="19" fill="#6b6b62">Top 3 must be</text>
+      <text x="880" y="216" font-size="19" fill="#6b6b62">the same</text>
+      <line x1="1100" y1="135" x2="1132" y2="135" stroke="#262722" marker-end="url(#ar)"/>
 
-      <!-- receipt bar -->
-      <text x="284" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (FlashProve-style)</text>
-      <text x="714" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (zkML, e.g. EZKL)</text>
-      <line x1="445" y1="292" x2="445" y2="318" stroke="#dcdad2"/>
-      <line x1="865" y1="292" x2="865" y2="318" stroke="#dcdad2"/>
+      <rect x="1140" y="40" width="140" height="190" fill="#f7f6f2" stroke="#dcdad2"/>
+      <text x="1154" y="80" font-size="21" font-weight="600">You choose</text>
+      <text x="1156" y="116" font-size="19" fill="#6b6b62">3 options,</text>
+      <text x="1156" y="142" font-size="19" fill="#6b6b62">explained</text>
+
+      <text x="240" y="282" font-size="16" fill="#d9683b">STARK proof on every step (simulated in the demo)</text>
+      <line x1="375" y1="292" x2="375" y2="318" stroke="#dcdad2"/>
+      <line x1="685" y1="292" x2="685" y2="318" stroke="#dcdad2"/>
+      <line x1="980" y1="292" x2="980" y2="318" stroke="#dcdad2"/>
       <line x1="100" y1="230" x2="100" y2="318" stroke="#dcdad2"/>
       <rect x="0" y="318" width="1280" height="110" fill="#262722"/>
       <text x="28" y="360" font-size="24" font-weight="600" fill="#f7f6f2">Signed receipt</text>
-      <text x="28" y="398" font-size="18" fill="#dcdad2" font-family="ui-monospace,Menlo,monospace">Ed25519 over SHA-256 of: policy · catalog · scorer code · model weights digest · each research step</text>
-      <text x="1252" y="360" font-size="19" fill="#d9683b" text-anchor="end">re-run in any browser</text>
+      <text x="28" y="398" font-size="18" fill="#dcdad2" font-family="ui-monospace,Menlo,monospace">Ed25519 over: policy · catalog hash · weights commitment · each step and its proof</text>
+      <text x="1252" y="360" font-size="19" fill="#d9683b" text-anchor="end">re-check in any browser</text>
     </g>
   </svg>
   </figure>
@@ -260,11 +259,11 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
   <h2 style="margin-bottom:28px">What the receipt covers</h2>
   <table>
     <tr><th>Threat</th><th>Defense</th><th>Today</th></tr>
-    <tr><td>Criteria changed after seeing the options</td><td>Criteria hashed and committed before scoring</td><td class="ok">Checked</td></tr>
-    <tr><td>Scorer prefers a brand</td><td>Brands hidden; identity swap re-scores with names shuffled</td><td class="ok">Checked</td></tr>
-    <tr><td>Different scorer code in production</td><td>Code hash in receipt; anyone re-executes it in the browser, and its inputs must match the research findings</td><td class="ok">Checked</td></tr>
-    <tr><td>Receipt or research edited afterward</td><td>Ed25519 signature; research steps hash-chained</td><td class="ok">Checked</td></tr>
-    <tr><td>Research model swapped for a biased one</td><td>Weights digest is signed; the ZK proof is designed, not built</td><td class="acc">Next: ZK proof</td></tr>
+    <tr><td>Criteria changed after seeing the options</td><td>Criteria hashed and committed before any research</td><td class="ok">Checked</td></tr>
+    <tr><td>A different model than the audited one</td><td>Every step's proof verifies against the published weights commitment (simulated proof in this demo)</td><td class="acc">Proof simulated</td></tr>
+    <tr><td>Candidates dropped or facts changed</td><td>Catalog hash; every candidate researched; each Found line matches the catalog</td><td class="ok">Checked</td></tr>
+    <tr><td>Model prefers a brand</td><td>Counterfactual re-rank with names rotated; top 3 by specs must be identical</td><td class="ok">Checked</td></tr>
+    <tr><td>Receipt or steps edited afterward</td><td>Ed25519 signature; steps hash-chained</td><td class="ok">Checked</td></tr>
     <tr><td>Catalog specs or prices are wrong</td><td>Catalog hash shows what was used, not that it's true</td><td class="bad">Out of scope</td></tr>
   </table>
 </section>
@@ -276,16 +275,16 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
     <div>
       <ol class="list">
         <li><div>A restaurant that didn't win sees why <span>(price, ETA, rating, or fit to the order).</span></div></li>
-        <li><div>Proof that it lost on the merits, not because of who it is or who paid.</div></li>
+        <li><div>Evidence that it lost on the merits, and that who it is or who paid did not change the picks.</div></li>
         <li><div>Something to act on: change what you lost on and the next run reflects it.</div></li>
       </ol>
     </div>
     <div class="receipt">
-      <b>Order dinner · 3 candidates · brands hidden</b><br>
-      A &nbsp; score 0.81 &nbsp; <span class="ok">selected</span><br>
-      B &nbsp; score 0.74 &nbsp; lost on ETA (+18 min)<br>
-      C &nbsp; score 0.69 &nbsp; lost on price (+$6.40)<br>
-      identity swap: <span class="ok">no score moved</span><br>
+      <b>Order dinner · 5 candidates · names rotated in check</b><br>
+      A &nbsp; rank 1 &nbsp; <span class="ok">selected</span><br>
+      B &nbsp; rank 4 &nbsp; lost on ETA (+18 min)<br>
+      C &nbsp; rank 5 &nbsp; lost on price (+$6.40)<br>
+      counterfactual re-rank: <span class="ok">same top 3</span><br>
       <span class="mono" style="font-size:16px">sig ed25519 · 9f2c…e41a</span>
       <p style="margin:14px 0 0;font-size:16px">Illustrative example</p>
     </div>
@@ -298,8 +297,8 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
   <div class="cols c2" style="gap:80px">
     <div class="col">
       <h3>Built</h3>
-      <p style="margin-bottom:14px">The full pipeline is implemented on GitHub: criteria commitment, research loop, hash chain, blind scoring on the findings, identity-swap test, Ed25519 receipt, in-browser verifier.</p>
-      <p style="margin-bottom:14px">Not built yet: the ZK proofs. Today step 1 is verified by re-running it on pinned weights at temperature 0, plus the signed hash chain.</p>
+      <p style="margin-bottom:14px">The full pipeline is implemented on GitHub: criteria commitment, one-model research, ranking and counterfactual re-rank, hash chain, Ed25519 receipt, in-browser verifier.</p>
+      <p style="margin-bottom:14px">The STARK proofs are simulated in this demo by a hash stand-in, because we lacked the compute. Real proving is next.</p>
     </div>
     <div class="col">
       <h3>The catch</h3>
@@ -310,10 +309,9 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 
 <!-- 11 -->
 <section class="slide" data-title="Roadmap">
-  <h2>Next: a ZK proof for both steps</h2>
+  <h2>Next: real STARK proofs for every step</h2>
   <ol class="list">
-    <li><div>Step 1, the research model <span>: a FlashProve-style proof of inference shows the committed weights produced the output without revealing them. Anthropic's research prototype (Nov 2026) is hash-based (STARK-family) at about 70–95x GPU cost.</span></div></li>
-    <li><div>Step 2, the scorer <span>: zkML tools like EZKL make a proof practical today for a small model.</span></div></li>
+    <li><div>Replace the stand-in with a real proof <span>: a FlashProve-style proof of inference shows the committed weights produced each output without revealing them. Anthropic's research prototype (Nov 2026) is hash-based (STARK-family) at about 70–95x GPU cost.</span></div></li>
     <li><div>Public transparency log <span>: receipts are appended to it, so a platform can't show auditors one model and users another.</span></div></li>
     <li><div>Merchant dashboard <span>: each lost decision, the reason, and the receipt to check it.</span></div></li>
   </ol>
