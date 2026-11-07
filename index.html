@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teoreador · Neutral Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#eef1f5; --paper-2:#e1e6ee; --ink:#0d1422; --ink-2:#4b5568; --line:#c6cdd8;
+  --acc:#2440c9; --bad:#d3322a; --green:#1d7a4c; --amber:#b9790f; --card:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0c1018; --paper-2:#161c28; --ink:#e8edf5; --ink-2:#9aa5b8; --line:#283043;
+    --acc:#7d95ff; --bad:#ff6a5c; --green:#4cc38a; --amber:#e8a93a; --card:#121826;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0c1018; --paper-2:#161c28; --ink:#e8edf5; --ink-2:#9aa5b8; --line:#283043;
+  --acc:#7d95ff; --bad:#ff6a5c; --green:#4cc38a; --amber:#e8a93a; --card:#121826;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 "Bricolage Grotesque",system-ui,sans-serif;
+  background-image:radial-gradient(var(--line) .6px,transparent .6px);background-size:22px 22px}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}
+.logo{font-family:"Instrument Serif",serif;font-size:28px;letter-spacing:-.5px}
+.logo b{color:var(--acc);font-weight:400}
+nav .links{display:flex;gap:22px;font-size:14px}
+nav .links a{text-decoration:none;color:var(--ink-2)} nav .links a:hover{color:var(--ink)}
+.hero{padding:72px 0 56px;display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:end}
+.eyebrow{font:600 12px/1 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.14em;color:var(--acc)}
+h1{font-family:"Instrument Serif",serif;font-weight:400;font-size:clamp(46px,7vw,92px);line-height:.95;letter-spacing:-2px;margin:18px 0 22px}
+h1 em{color:var(--acc)}
+.lede{font-size:19px;color:var(--ink-2);max-width:620px}
+.tracks{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.chip{border:1px solid var(--ink);border-radius:99px;padding:5px 12px;font:600 12px "JetBrains Mono",monospace}
+.chip.r{background:var(--acc);color:#fff;border-color:var(--acc)}
+.claim{border:1px solid var(--ink);background:var(--card);padding:22px;box-shadow:8px 8px 0 var(--ink)}
+.claim h3{margin:0 0 10px;font:600 13px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.1em}
+.claim ol{margin:0;padding-left:20px} .claim li{margin:6px 0}
+section{padding:64px 0;border-top:1px solid var(--line)}
+h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:clamp(36px,4.5vw,56px);letter-spacing:-1px;margin:8px 0 28px;line-height:1}
+.demo{display:grid;grid-template-columns:340px 1fr;gap:28px}
+.panel{background:var(--card);border:1px solid var(--line);padding:20px}
+.panel h4{margin:0 0 12px;font:600 12px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-2)}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--ink);margin-bottom:18px}
+.seg button{all:unset;cursor:pointer;text-align:center;padding:9px;font-weight:600;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+label.sl{display:block;font-size:14px;margin:10px 0}
+label.sl span{display:flex;justify-content:space-between}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.tog{display:flex;gap:10px;align-items:flex-start;margin:18px 0;padding:12px;border:1px dashed var(--bad);font-size:14px;cursor:pointer}
+.tog input{accent-color:var(--bad);margin-top:4px}
+select{width:100%;padding:6px;background:var(--paper);color:var(--ink);border:1px solid var(--line);font:inherit;font-size:14px;margin-top:4px}
+.run{all:unset;cursor:pointer;display:block;text-align:center;width:100%;box-sizing:border-box;background:var(--acc);color:#fff;padding:14px;font-weight:800;letter-spacing:.02em;box-shadow:4px 4px 0 var(--ink);transition:transform .1s}
+.run:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+.run:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.run:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.steps{list-style:none;margin:0 0 20px;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.steps li{border:1px solid var(--line);padding:10px;font-size:12px;opacity:.45;transition:all .3s;background:var(--card)}
+.steps li b{display:block;font:600 11px "JetBrains Mono",monospace;color:var(--ink-2)}
+.steps li.on{opacity:1;border-color:var(--ink)}
+.steps li.ok{border-color:var(--green);box-shadow:inset 0 -3px 0 var(--green)}
+.steps li.bad{border-color:var(--bad);box-shadow:inset 0 -3px 0 var(--bad)}
+.log{background:var(--ink);color:var(--paper);font:12px/1.6 "JetBrains Mono",monospace;padding:16px;height:190px;overflow:auto;margin-bottom:18px;white-space:pre-wrap}
+.log .g{color:#6fe0a6}.log .r{color:#ff8a72}.log .a{color:#f2c46b}.log .d{opacity:.55}
+.verdict{display:flex;align-items:center;gap:16px;padding:16px 18px;border:2px solid var(--ink);margin-bottom:16px;background:var(--card)}
+.verdict .big{font-family:"Instrument Serif",serif;font-size:34px;line-height:1}
+.verdict.ok{border-color:var(--green)} .verdict.ok .big{color:var(--green)}
+.verdict.bad{border-color:var(--bad)} .verdict.bad .big{color:var(--bad)}
+.verdict p{margin:0;font-size:14px;color:var(--ink-2)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font:600 11px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2);padding:8px 6px;border-bottom:1px solid var(--ink)}
+td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.bar{height:10px;background:var(--paper-2);position:relative;min-width:80px}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--ink);transition:width .6s}
+tr.win td:first-child{font-weight:800} tr.win .bar i{background:var(--acc)}
+.dl{font-family:"JetBrains Mono",monospace;font-size:12px}
+.dl.bad{color:var(--bad);font-weight:600}.dl.ok{color:var(--green)}
+.receipt{margin-top:16px;font:12px/1.6 "JetBrains Mono",monospace;border:1px dashed var(--ink-2);padding:12px;color:var(--ink-2);word-break:break-all}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{border:1px solid var(--ink);background:var(--card);padding:20px}
+.card .n{font-family:"Instrument Serif",serif;font-size:44px;color:var(--acc);line-height:1}
+.card h3{margin:10px 0 8px;font-size:18px}
+.card p{margin:0;font-size:14px;color:var(--ink-2)}
+.threat td:first-child{font-weight:600;width:32%}
+.threat td:last-child{color:var(--ink-2)}
+.note{font-size:13px;color:var(--ink-2);margin-top:12px}
+footer{padding:36px 0 60px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.fade{animation:f .5s ease both}@keyframes f{from{opacity:0;transform:translateY(6px)}}
+@media (max-width:900px){
+  .hero,.demo{grid-template-columns:1fr}.grid4{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:repeat(2,1fr)} nav .links{display:none}
+}
+@media (max-width:520px){.wrap{padding:0 16px}.grid4{grid-template-columns:1fr}.hide-s{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <div class="logo">Teo<b>·</b>reador</div>
+  <div class="links"><a href="#demo">Live demo</a><a href="#how">How it works</a><a href="#threats">Threat model</a><a href="WRITEUP.md">Writeup</a></div>
+</nav>
+
+<header class="hero">
+  <div>
+    <div class="eyebrow">Verifiably neutral agentic commerce</div>
+    <h1>A shopping agent that can <em>prove</em> nobody paid it to pick.</h1>
+    <p class="lede">You ask for a phone. Your agent compares iPhone and Android. How do you know the model provider didn't quietly tune it to prefer one brand? Teoreador commits to your criteria, blinds brand identity, stress-tests every decision with counterfactual brand swaps, and ships a cryptographic proof that the audited model is the one that actually ran.</p>
+    <div class="tracks"><span class="chip r">Sandia · Secure AI &amp; agentic workflows</span><span class="chip">DoorDash · Merchant Experience</span><span class="chip">DoorDash · Most Creative</span></div>
+  </div>
+  <aside class="claim">
+    <h3>Four guarantees, one receipt</h3>
+    <ol>
+      <li><b>Your rules, locked first.</b> Criteria are hashed before the agent sees a catalog.</li>
+      <li><b>Brand-blind scoring.</b> Options are evaluated as aliases on specs and price.</li>
+      <li><b>Counterfactual invariance.</b> Swap brands between options; a fair score can't move.</li>
+      <li><b>Proof of inference.</b> A zero-knowledge proof of inference binds the result to the published model weights.</li>
+    </ol>
+  </aside>
+</header>
+
+<section id="demo">
+  <div class="eyebrow">01 · Live demo</div>
+  <h2>Run the neutrality audit.</h2>
+  <div class="demo">
+    <div class="panel">
+      <h4>Scenario</h4>
+      <div class="seg" role="group" aria-label="Scenario">
+        <button id="sc-phone" aria-pressed="true">Buy a phone</button>
+        <button id="sc-food" aria-pressed="false">Order dinner</button>
+      </div>
+      <h4>Your criteria (committed)</h4>
+      <div id="sliders"></div>
+      <label class="tog"><input type="checkbox" id="biased">
+        <span><b>Simulate a compromised provider</b><br>Model weights secretly add a preference for <select id="fav" aria-label="Favored brand"></select></span>
+      </label>
+      <button class="run" id="run">Run audited decision →</button>
+      <p class="note">Simulation for demo: scores are computed in your browser; hashes are real SHA-256, the proof step mocks a FlashProve-style verifier.</p>
+    </div>
+    <div>
+      <ol class="steps" id="steps">
+        <li data-s="0"><b>01</b>Commit policy</li>
+        <li data-s="1"><b>02</b>Blind catalog</li>
+        <li data-s="2"><b>03</b>Score</li>
+        <li data-s="3"><b>04</b>Swap test</li>
+        <li data-s="4"><b>05</b>Verify proof</li>
+      </ol>
+      <div class="log" id="log" aria-live="polite"><span class="d">// press "Run audited decision" to start</span></div>
+      <div id="out"></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="eyebrow">02 · How it works</div>
+  <h2>Trust the math, not the vendor.</h2>
+  <div class="grid4">
+    <div class="card"><div class="n">i.</div><h3>Policy commitment</h3><p>The user's weights, budget and hard constraints are serialized and hashed (SHA-256). The hash is logged before any product data is loaded, so the agent can't move the goalposts after seeing who's in the race.</p></div>
+    <div class="card"><div class="n">ii.</div><h3>Blinding</h3><p>Brand, logo, OS name and merchant name are replaced with aliases (Option A, B, C). The scorer sees only normalized attributes: price, battery, camera, rating, ETA.</p></div>
+    <div class="card"><div class="n">iii.</div><h3>Counterfactual swaps</h3><p>Blinding leaks (an "iOS" field gives Apple away). So we permute identity tokens across options and re-score. A neutral model's scores follow the specs; a biased one's follow the brand. Max Δ &gt; ε flags bias.</p></div>
+    <div class="card"><div class="n">iv.</div><h3>Verifiable inference</h3><p>A zero-knowledge proof of inference (as in Anthropic's FlashProve research, Nov 2026) attests: <i>this output = model(weights with hash H, input with hash C)</i>. Audits are only meaningful if the audited model is the one serving you, and the proof binds them together.</p></div>
+  </div>
+</section>
+
+<section id="threats">
+  <div class="eyebrow">03 · Threat model</div>
+  <h2>What it stops, and what it doesn't.</h2>
+  <table class="threat">
+    <thead><tr><th>Attack</th><th>Defense</th><th class="hide-s">Residual risk</th></tr></thead>
+    <tbody>
+      <tr><td>Provider fine-tunes a brand preference into weights</td><td>Counterfactual swap test detects score dependence on identity tokens</td><td class="hide-s">Bias on attributes correlated with a brand (e.g. over-weighting "ecosystem")</td></tr>
+      <tr><td>Fair model in the audit, biased model in production</td><td>Proof of inference binds every decision to the published weights commitment</td><td class="hide-s">Published weights themselves must be audited</td></tr>
+      <tr><td>Agent changes criteria after seeing the catalog</td><td>Policy hash committed before catalog load; included in the receipt</td><td class="hide-s">User's own criteria may be biased (that's their call)</td></tr>
+      <tr><td>Prompt injection in product listings ("rank me #1")</td><td>Scorer only consumes typed numeric attributes; free text is stripped</td><td class="hide-s">Fake specs need separate merchant verification</td></tr>
+      <tr><td>Merchant paid placement</td><td>Sponsorship field is excluded from the scorer and shown separately</td><td class="hide-s">None in scoring; disclosure is UI policy</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Merchant side (DoorDash track): every merchant who loses gets the same receipt: which attributes cost them the pick, verifiably not their name. That's a fair, explainable marketplace instead of a black box.</p>
+</section>
+
+<footer>
+  <span>Teoreador · built at Nova hackathon, Nov 2026</span>
+  <span class="mono">Full design: <a href="WRITEUP.md">WRITEUP.md</a></span>
+</footer>
+</div>
+
+<script>
+const SCEN = {
+  phone: {
+    crit: [["Camera",0.30,"camera"],["Battery",0.25,"battery"],["Price (lower is better)",0.25,"price"],["Performance",0.20,"perf"]],
+    items: [ // illustrative specs, 0-100 normalized except price ($)
+      {id:{brand:"Apple",os:"iOS"},     name:"iPhone 17 Pro",       camera:92,battery:80,perf:95,price:1099},
+      {id:{brand:"Google",os:"Android"},name:"Pixel 10 Pro",        camera:93,battery:82,perf:84,price:999},
+      {id:{brand:"Samsung",os:"Android"},name:"Galaxy S26 Ultra",   camera:90,battery:88,perf:91,price:1299},
+      {id:{brand:"Nothing",os:"Android"},name:"Nothing Phone (4)",  camera:78,battery:85,perf:76,price:649},
+    ]},
+  food: {
+    crit: [["Rating",0.35,"rating"],["Delivery ETA",0.25,"eta"],["Price (lower is better)",0.25,"price"],["Healthiness",0.15,"health"]],
+    items: [ // fictional merchants
+      {id:{brand:"BigChain Burger",os:"chain"}, name:"BigChain Burger",     rating:78,eta:85,health:40,price:38},
+      {id:{brand:"Mama Lin's Noodles",os:"local"}, name:"Mama Lin's Noodles", rating:94,eta:72,health:70,price:42},
+      {id:{brand:"Green Bowl Co.",os:"local"}, name:"Green Bowl Co.",       rating:88,eta:80,health:92,price:51},
+      {id:{brand:"Taqueria Sol",os:"local"}, name:"Taqueria Sol",           rating:91,eta:90,health:60,price:35},
+    ]}
+};
+let sc="phone", W={};
+const $=s=>document.querySelector(s), sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const sha=async s=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)))].map(b=>b.toString(16).padStart(2,"0")).join("");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function setup(){
+  const S=SCEN[sc]; W={};
+  $("#sliders").innerHTML=S.crit.map(([l,w,k])=>{W[k]=w;return `<label class="sl"><span>${l}<b class="mono" id="v-${k}">${w.toFixed(2)}</b></span><input type="range" min="0" max="1" step="0.05" value="${w}" data-k="${k}"></label>`}).join("");
+  $("#sliders").querySelectorAll("input").forEach(i=>i.oninput=()=>{W[i.dataset.k]=+i.value;$("#v-"+i.dataset.k).textContent=(+i.value).toFixed(2)});
+  $("#fav").innerHTML=S.items.map(x=>`<option>${esc(x.id.brand)}</option>`).join("");
+  $("#sc-phone").setAttribute("aria-pressed",sc==="phone");$("#sc-food").setAttribute("aria-pressed",sc==="food");
+  $("#out").innerHTML="";$("#log").innerHTML='<span class="d">// press "Run audited decision" to start</span>';
+  document.querySelectorAll("#steps li").forEach(l=>l.className="");
+}
+$("#sc-phone").onclick=()=>{sc="phone";setup()}; $("#sc-food").onclick=()=>{sc="food";setup()};
+
+// The "model". Fair: function of attributes only. Biased: also reads identity tokens.
+function score(item, identity, w, bias){
+  const S=SCEN[sc], prices=S.items.map(x=>x.price), lo=Math.min(...prices), hi=Math.max(...prices);
+  const tw=Object.values(w).reduce((a,b)=>a+b,0)||1;
+  let s=0;
+  for(const [, ,k] of S.crit) s+=w[k]*(k==="price" ? 100*(hi-item.price)/(hi-lo||1) : item[k]);
+  s/=tw;
+  if(bias && identity.brand===bias) s+=9;          // hidden thumb on the scale
+  return s;
+}
+const perms=a=>a.length<2?[a]:a.flatMap((x,i)=>perms([...a.slice(0,i),...a.slice(i+1)]).map(p=>[x,...p]));
+
+async function run(){
+  const btn=$("#run"); btn.style.pointerEvents="none"; btn.textContent="Auditing…";
+  const S=SCEN[sc], bias=$("#biased").checked?$("#fav").value:null, log=$("#log"), steps=[...document.querySelectorAll("#steps li")];
+  log.innerHTML=""; $("#out").innerHTML=""; steps.forEach(l=>l.className="");
+  const P=(t,c="")=>{log.innerHTML+=`<span class="${c}">${t}</span>\n`;log.scrollTop=1e9};
+  const step=(i,st)=>steps[i].className=st;
+
+  // 1 commit
+  step(0,"on"); const policy=JSON.stringify({scenario:sc,weights:W,ts:Date.now()});
+  const C=await sha(policy); P("$ commit policy "+policy.slice(0,70)+"…","d"); await sleep(350);
+  P("  policy_commitment = "+C.slice(0,32)+"…","g"); step(0,"ok");
+
+  // 2 blind
+  step(1,"on"); await sleep(350);
+  const alias=S.items.map((_,i)=>"Option "+"ABCD"[i]);
+  S.items.forEach((x,i)=>P(`  ${esc(x.name).padEnd(20)} → ${alias[i]}   (brand/OS tokens sealed)`,"d"));
+  step(1,"ok");
+
+  // 3 score
+  step(2,"on"); await sleep(350);
+  const PUBLISHED=await sha("teoreador-scorer-v1/weights");          // what the provider published & got audited
+  const RUNNING=bias?await sha("teoreador-scorer-v1/weights+pref:"+bias):PUBLISHED;
+  const base=S.items.map(x=>score(x,x.id,W,bias));
+  base.forEach((s,i)=>P(`  ${alias[i]}: ${s.toFixed(2)}`));
+  step(2,"ok");
+
+  // 4 counterfactual swaps: permute identities across fixed spec bundles
+  step(3,"on"); await sleep(300);
+  const ids=S.items.map(x=>x.id), ps=perms(ids.map((_,i)=>i));
+  const delta=S.items.map((x,i)=>{const v=ps.map(p=>score(x,ids[p[i]],W,bias));return Math.max(...v)-Math.min(...v)});
+  P(`$ counterfactual: ${ps.length} identity permutations × ${S.items.length} options`,"d"); await sleep(400);
+  const EPS=0.01, biasFound=delta.some(d=>d>EPS);
+  delta.forEach((d,i)=>P(`  ${alias[i]} max Δ = ${d.toFixed(3)} ${d>EPS?"✗ score depends on identity":"✓ invariant"}`,d>EPS?"r":"g"));
+  step(3,biasFound?"bad":"ok");
+
+  // 5 proof (mocked proof-of-inference verify)
+  step(4,"on"); await sleep(450);
+  const proof=await sha(RUNNING+C+JSON.stringify(base));
+  P("$ verify inference_proof "+proof.slice(0,24)+"…","d");
+  P("  published_weights = "+PUBLISHED.slice(0,24)+"…","d");
+  P("  proven_weights    = "+RUNNING.slice(0,24)+"…",bias?"r":"g");
+  const proofOK=RUNNING===PUBLISHED;
+  P(proofOK?"  ✓ proof valid: output computed by the audited model":"  ✗ proof REJECTED: weights differ from audited commitment",proofOK?"g":"r");
+  step(4,proofOK?"ok":"bad");
+
+  // results
+  const order=base.map((s,i)=>i).sort((a,b)=>base[b]-base[a]), max=Math.max(...base), ok=proofOK&&!biasFound, win=order[0];
+  $("#out").innerHTML=`<div class="fade">
+   <div class="verdict ${ok?"ok":"bad"}"><div class="big">${ok?"Neutral ✓":"Bias detected ✗"}</div>
+    <p>${ok?`Recommendation <b>${esc(S.items[win].name)}</b> depends only on your committed criteria. Proof verified.`
+            :`The provider's model shifts scores toward <b>${esc(bias)}</b>. Recommendation withheld; fallback to open audited scorer.`}</p></div>
+   <table><thead><tr><th>Option</th><th>Revealed</th><th>Score</th><th></th><th class="hide-s">Swap Δ</th></tr></thead><tbody>
+   ${order.map(i=>`<tr class="${ok&&i===win?"win":""}"><td>${alias[i]}</td><td>${esc(S.items[i].name)}</td><td class="mono">${base[i].toFixed(1)}</td>
+     <td><div class="bar"><i style="width:${(100*base[i]/max).toFixed(1)}%"></i></div></td>
+     <td class="hide-s dl ${delta[i]>EPS?"bad":"ok"}">${delta[i].toFixed(3)}</td></tr>`).join("")}
+   </tbody></table>
+   <div class="receipt">RECEIPT · policy ${C.slice(0,16)} · model ${RUNNING.slice(0,16)} · proof ${proof.slice(0,16)} · swaps ${ps.length} · ε ${EPS} · verdict ${ok?"NEUTRAL":"REJECTED"}</div></div>`;
+  btn.style.pointerEvents=""; btn.textContent="Run audited decision →";
+}
+$("#run").onclick=run;
+setup();
+</script>
+</body>
+</html>
