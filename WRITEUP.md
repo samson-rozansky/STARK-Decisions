@@ -25,25 +25,29 @@ People already distrust AI that thinks for them, or that might be steered by who
 ## How it works
 
 ```
-criteria ──► [1] DECISION MODEL ──► top 3 ──► [2] RESEARCH LOOP ──► brief ──► signed receipt
- (hashed)     open scorer,                    Qwen3.5, 2 rounds       (no pick)   Ed25519
-              swap test                       per product, chained
+criteria ──► [1] RESEARCH LOOP ──► findings ──► [2] DECISION MODEL ──► top 3 ──► brief ──► signed receipt
+ (hashed)     Qwen3.5-27B, every    (numbers)      open scorer,                  (no pick)   Ed25519
+              option, chained                      swap test
 ```
 
-### Step 1: decision model (`decision.js`)
+### Step 1: auto-research loop (Qwen3.5-27B)
 
-- An open, deterministic scorer. It scores **specs only** (normalized per attribute across the catalog, weighted by the user's criteria; price is inverted). Name, brand and OS are never inputs.
-- The user's criteria are committed via SHA-256 (`policy_hash`) before scoring.
-- **Identity-swap counterfactual test.** Keep each option's specs fixed, permute the identity fields (name, brand, os) across options, re-score, and record the maximum score change. For a neutral scorer this is exactly 0. The receipt records `swap_max_delta` and the number of swaps.
+- The research agent (open weights, temperature 0, pinned weights digest) researches **every** option in the catalog, not a shortlist. Each product gets 2 rounds of question then answer: it asks the most useful next question a careful buyer should check and answers from the spec sheet and widely known facts. It is told not to praise or criticize the brand. No web access in this build.
+- Each step ends with a `Found:` line restating the facts it used as structured numbers (e.g. camera, battery, performance, price for phones; rating, delivery speed, health, price for restaurants).
+- Determinism: temperature 0, seed 42, `num_predict` 220, and the Ollama weights digest pinned.
+- Every step (prompt, output, hashes of both) is hash-chained. The chain starts from `sha256(policy + catalog hash)`, and each step stores the previous step's hash.
+
+### Step 2: decision model (`decision.js`)
+
+- An open, deterministic scorer. It takes the research findings as input, hides brand names, and scores **those numbers only** (normalized per attribute across the catalog, weighted by the user's criteria; price is inverted). Name, brand and OS are never inputs. The verifier checks that the decision model's inputs match the research findings.
+- The user's criteria are committed via SHA-256 (`policy_hash`) before anything is researched or scored.
+- **Identity-swap counterfactual test.** Keep each option's numbers fixed, permute the identity fields (name, brand, os) across options, re-score, and record the maximum score change. For a neutral scorer this is exactly 0. The receipt records `swap_max_delta` and the number of swaps.
 - Output: the top 3 options.
 - The same file runs on the server and in the browser, so anyone can re-execute it. Its hash is recorded in the receipt as `scorer_hash`.
 
-### Step 2: auto-research loop (Qwen3.5)
+### Brief and your choice
 
-- For each of the top 3 products, the model runs 2 rounds of question then answer: it asks the most useful next question a careful buyer should check, and answers from the spec sheet and widely known facts. It is told not to praise or criticize the brand. No web access in this build.
-- A final brief says, for each option, who it suits and one trade-off. It does **not** choose for the user.
-- Determinism: temperature 0, seed 42, `num_predict` 220, and the Ollama weights digest pinned.
-- Every step (prompt, output, hashes of both) is hash-chained. The chain starts from `sha256(policy + catalog hash)`, and each step stores the previous step's hash.
+- A short brief covers the top 3: for each option, who it suits and one trade-off. It does **not** choose for the user; the user makes the final choice.
 
 ### The receipt (from `server.mjs`)
 
@@ -65,10 +69,11 @@ The private key stays local (`.keys/`, gitignored); the public key is published 
 2. the policy hash
 3. the catalog hash against the published `catalog.json`
 4. the scorer hash against the published `decision.js`
-5. the ranking, by **re-executing** `decision.js` and comparing top 3 and scores
-6. the swap test, which must show max Δ of 0
-7. the research hash chain, step by step
-8. that the model weights digest is pinned
+5. the decision model's inputs against the research findings
+6. the ranking, by **re-executing** `decision.js` and comparing top 3 and scores
+7. the swap test, which must show max Δ of 0
+8. the research hash chain, step by step
+9. that the model weights digest is pinned
 
 `node verify.mjs receipt.json --rerun` goes further: it checks the local Ollama digest matches the receipt, re-runs every research prompt at temperature 0, and checks each output hashes to the recorded value.
 

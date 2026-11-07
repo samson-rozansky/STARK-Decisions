@@ -1,7 +1,9 @@
 {
   "project": "STARK-Decisions",
-  "version": 1,
-  "created": "2026-11-07T21:38:30.745Z",
+  "version": 2,
+  "order": "research-then-decide",
+  "created": "2026-11-07T21:50:12.304Z",
+  "catalog": "catalog.json",
   "policy": {
     "weights": {
       "camera": 0.3,
@@ -13,9 +15,95 @@
   },
   "policy_hash": "339475c70efe28ba647718d565a669dbbdf6d2a6cca48af0850867702e69ab28",
   "catalog_hash": "fc792d11b4b1a2b6ed5e5da1b37d0da5b175aa6947176f9216154d5c12540c3c",
+  "research": {
+    "model": "simulated",
+    "simulated": true,
+    "model_digest": null,
+    "note": "Research text written for the demo; no model was run. A real qwen3.5:4b run is in receipts/qwen3.5-4b-run.json.",
+    "rounds": 1,
+    "steps": [
+      {
+        "kind": "research",
+        "product": "p1",
+        "round": 1,
+        "prompt": "Research iPhone 17 Pro: ask the most useful buyer question, answer it, then list the facts found.",
+        "prompt_hash": "aaf7efdbde90058a301e9ea0523c4166f5c2aa9771056f1a1e9bc0694dc9435d",
+        "output": "Q: How long will the battery last on a heavy day?\nA: It has the strongest chip in the group but a battery score of 80, so heavy users may need a top-up by evening.\nFound: camera 92, battery 80, performance 95, price 1099",
+        "output_hash": "b920cb6bd4d542d0224ef90e6dc7c3cbbcbd41a6f33a0cf7c44d5d3e931d407f",
+        "prev": "128c2557b05bbeca9e37389c99f1680a05bf76b380ac0cf427a1efa1ff032ac0",
+        "hash": "57b689c3f28a5cb0e035307cf8d3fd4d91bba6b1eb088b544fa70296f79816f5"
+      },
+      {
+        "kind": "research",
+        "product": "p2",
+        "round": 1,
+        "prompt": "Research Pixel 10 Pro: ask the most useful buyer question, answer it, then list the facts found.",
+        "prompt_hash": "9b215735eb0c444ae6bce69c365634c48c17e82d8b73b0e7d86dbd7f874d8ed1",
+        "output": "Q: Is the camera worth the price?\nA: It has the highest camera score here (93) at $999, which is $100 less than the iPhone 17 Pro.\nFound: camera 93, battery 82, performance 84, price 999",
+        "output_hash": "b1c6d3048cd72487c51dd8cd0bb99b34f33129fe3d315ce65385fa98204f81bc",
+        "prev": "57b689c3f28a5cb0e035307cf8d3fd4d91bba6b1eb088b544fa70296f79816f5",
+        "hash": "12ec49e5c2effd4cb40d75ddfeb35a5275eea38502ce035f12576082287d0a37"
+      },
+      {
+        "kind": "research",
+        "product": "p3",
+        "round": 1,
+        "prompt": "Research Galaxy S26 Ultra: ask the most useful buyer question, answer it, then list the facts found.",
+        "prompt_hash": "e397dba00eb6bcab45302b073cbdb6b9c314d904462063a0154298e79512d97c",
+        "output": "Q: What do you get for the highest price?\nA: At $1,299 it's the most expensive, with strong battery (88) and performance (91), but its camera (90) trails two cheaper phones.\nFound: camera 90, battery 88, performance 91, price 1299",
+        "output_hash": "f0567f5f7672d16dfe3dbfd329f5af7515ad6148e0ccb52d967327039aed1820",
+        "prev": "12ec49e5c2effd4cb40d75ddfeb35a5275eea38502ce035f12576082287d0a37",
+        "hash": "fd8f24b5350fd4b39b340506fef73bbb29e47b380d7ac26fae5e7d9fa92e6b90"
+      },
+      {
+        "kind": "research",
+        "product": "p4",
+        "round": 1,
+        "prompt": "Research Nothing Phone (4): ask the most useful buyer question, answer it, then list the facts found.",
+        "prompt_hash": "0339cf642c7c33dc8bc30ecbc63f2d9b0058bdcefe6c59e83dc994ad522519fd",
+        "output": "Q: Is the low price a trap?\nA: At $649 it's the cheapest by $150. Battery is good (85), but camera (78) and performance (76) are the weakest here.\nFound: camera 78, battery 85, performance 76, price 649",
+        "output_hash": "4cdd7737864883bb4bfeb86bd3535e44d0c8005a8df8172924941379bb20b438",
+        "prev": "fd8f24b5350fd4b39b340506fef73bbb29e47b380d7ac26fae5e7d9fa92e6b90",
+        "hash": "39f0e6fb592bb1f9acdf48f6c42417b2dd43a30787849d6c6a368ebc042c866b"
+      },
+      {
+        "kind": "research",
+        "product": "p5",
+        "round": 1,
+        "prompt": "Research iPhone 17: ask the most useful buyer question, answer it, then list the facts found.",
+        "prompt_hash": "1c5f752fefb0bce4f90a6c7269f51a918736ba64cd4c26ebe6214acec3334da2",
+        "output": "Q: How much do you lose against the Pro model?\nA: It costs $300 less than the 17 Pro, with lower camera (84) and battery (78) scores.\nFound: camera 84, battery 78, performance 88, price 799",
+        "output_hash": "cd30cb3e14e102bdae837d7307de6f928cb86d76a8459e2433ead92e987f8ee5",
+        "prev": "39f0e6fb592bb1f9acdf48f6c42417b2dd43a30787849d6c6a368ebc042c866b",
+        "hash": "27ae4569428eb2cf6984abe1708bb791f764b0a981a7852f2817686894e34887"
+      },
+      {
+        "kind": "research",
+        "product": "p6",
+        "round": 1,
+        "prompt": "Research OnePlus 15: ask the most useful buyer question, answer it, then list the facts found.",
+        "prompt_hash": "dfd38fe04b13ae13397f90f1f01eeefcc8400804af367b89eee5e4ed91240141",
+        "output": "Q: Where does it stand out?\nA: It has the best battery in the catalog (93) and strong performance (90) at $899, with a mid-range camera (86).\nFound: camera 86, battery 93, performance 90, price 899",
+        "output_hash": "22c2105ed367630181f432244349d0f639c18ea9a0306825ea7418b45989dc48",
+        "prev": "27ae4569428eb2cf6984abe1708bb791f764b0a981a7852f2817686894e34887",
+        "hash": "ee070522f27989f28445a3e7a261cf14541bfbbb21c41db18b97508353f11b51"
+      },
+      {
+        "kind": "brief",
+        "prompt": "Brief on the top 3: p6,p1,p2",
+        "prompt_hash": "fc0a2e8b3ad24ccc2c080115af4b45ca9b961b67be1a39e31a5681b8243ac1e4",
+        "output": "OnePlus 15 suits someone who wants the longest battery life for the money. Its camera is a step below the others.\niPhone 17 Pro suits someone who wants the fastest phone and a top camera. It costs more and its battery is weaker.\nPixel 10 Pro suits someone who cares most about photos. Its performance trails the other two.\nOne question decides it: battery, speed or camera?",
+        "output_hash": "c69a141daab82f63c27e5e71a4c3370f6fe5f4a39827a0b4e830a024be0b4f5c",
+        "prev": "ee070522f27989f28445a3e7a261cf14541bfbbb21c41db18b97508353f11b51",
+        "hash": "be694db82e52ad7ea3f0bbf7c0380688b1126331112ca0e45f657471de5d5224"
+      }
+    ],
+    "chain_head": "be694db82e52ad7ea3f0bbf7c0380688b1126331112ca0e45f657471de5d5224"
+  },
   "decision": {
     "scorer": "decision.js",
     "scorer_hash": "19679974738093d3b8a8780f15c88e9920fe1c2d81c6e75e17194ce53f3f8913",
+    "input": "research findings",
     "top": [
       "p6",
       "p1",
@@ -32,95 +120,7 @@
     "swap_max_delta": 0,
     "swaps": 720
   },
-  "research": {
-    "model": "qwen3.5:4b",
-    "model_digest": "7f3251fa6878a78a606bcb3c074283306e5ad2ea411a7774a9dd98a4bc7f2d13",
-    "options": {
-      "temperature": 0,
-      "seed": 42,
-      "num_predict": 220
-    },
-    "rounds": 2,
-    "steps": [
-      {
-        "kind": "research",
-        "product": "p6",
-        "round": 1,
-        "prompt": "You are a neutral product researcher. Product: OnePlus 15. Spec sheet: camera: 86/100, battery: 93/100, performance: 90/100, price: $899.\nBuyer priorities (weights): {\"battery\":0.25,\"camera\":0.3,\"performance\":0.2,\"price\":0.25}.\nNotes so far: none.\nAsk the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.\nReply exactly as:\nQ: <question>\nA: <answer>",
-        "prompt_hash": "5d2913c472076f48a97e7b8dd3afc7e908b03561ec39d65a8183ce50e74cd651",
-        "output": "Q: Does the OnePlus 15 support wireless charging speeds comparable to its flagship competitors?\nA: Yes, based on current industry standards for devices with a 93/100 battery score and high performance ratings, it is expected to support fast wireless charging (likely 80W or higher), though specific wattage isn't explicitly detailed in the provided spec sheet.",
-        "output_hash": "53882fb6d3512cfa57eea3b0070fa93ddf470485e27624916283c638ed7662e0",
-        "prev": "128c2557b05bbeca9e37389c99f1680a05bf76b380ac0cf427a1efa1ff032ac0",
-        "hash": "5a87fcceb9d1fa98d4b3d302c28cde38896d8cce22686048a8b22e9300803896"
-      },
-      {
-        "kind": "research",
-        "product": "p6",
-        "round": 2,
-        "prompt": "You are a neutral product researcher. Product: OnePlus 15. Spec sheet: camera: 86/100, battery: 93/100, performance: 90/100, price: $899.\nBuyer priorities (weights): {\"battery\":0.25,\"camera\":0.3,\"performance\":0.2,\"price\":0.25}.\nNotes so far: Q: Does the OnePlus 15 support wireless charging speeds comparable to its flagship competitors? A: Yes, based on current industry standards for devices with a 93/100 battery score and high performance ratings, it is expected to support fast wireless charging (likely 80W or higher), though specific wattage isn't explicitly detailed in the provided spec sheet..\nAsk the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.\nReply exactly as:\nQ: <question>\nA: <answer>",
-        "prompt_hash": "dac022e74d1b6e3a8ec9bffebcf0ba644750fcdeb99a38e9601d100428fb6d6a",
-        "output": "Q: What is the specific price point for the OnePlus 15 in the US market?\nA: The provided spec sheet lists a price of $899, but this figure does not account for potential regional taxes or carrier subsidies that could affect the final cost.",
-        "output_hash": "dde0c64ff280f05852052d1833ab8bd3b5e6b0ea0a789d0057af868fe3f5d4ee",
-        "prev": "5a87fcceb9d1fa98d4b3d302c28cde38896d8cce22686048a8b22e9300803896",
-        "hash": "ca5bb2436e7941312dcbf7dfc1cdb9cf520b07aa9db482b7fa2ecae757f740b7"
-      },
-      {
-        "kind": "research",
-        "product": "p1",
-        "round": 1,
-        "prompt": "You are a neutral product researcher. Product: iPhone 17 Pro. Spec sheet: camera: 92/100, battery: 80/100, performance: 95/100, price: $1099.\nBuyer priorities (weights): {\"battery\":0.25,\"camera\":0.3,\"performance\":0.2,\"price\":0.25}.\nNotes so far: none.\nAsk the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.\nReply exactly as:\nQ: <question>\nA: <answer>",
-        "prompt_hash": "958771289d31b1e2689273be000aece927da3f1618d80299eb6eabdf1b2e0507",
-        "output": "Q: Does the iPhone 17 Pro support wireless charging speeds exceeding 50W?\nA: The spec sheet does not list specific charging wattage, but based on widely known facts about Apple's current lineup, the device likely supports up to 25W MagSafe or 30W Pegasus charging, which is lower than the 50W+ speeds found in some Android competitors.",
-        "output_hash": "8f25646cb8ea8ab8b48f0d9eab19a5159f9225ee001e0bbe5c98d56afda32f32",
-        "prev": "ca5bb2436e7941312dcbf7dfc1cdb9cf520b07aa9db482b7fa2ecae757f740b7",
-        "hash": "e379bfb66d92379b21e3b1ebcae8ab7d7521d44ba5b152f57b0bfcf63da2faed"
-      },
-      {
-        "kind": "research",
-        "product": "p1",
-        "round": 2,
-        "prompt": "You are a neutral product researcher. Product: iPhone 17 Pro. Spec sheet: camera: 92/100, battery: 80/100, performance: 95/100, price: $1099.\nBuyer priorities (weights): {\"battery\":0.25,\"camera\":0.3,\"performance\":0.2,\"price\":0.25}.\nNotes so far: Q: Does the iPhone 17 Pro support wireless charging speeds exceeding 50W? A: The spec sheet does not list specific charging wattage, but based on widely known facts about Apple's current lineup, the device likely supports up to 25W MagSafe or 30W Pegasus charging, which is lower than the 50W+ speeds found in some Android competitors..\nAsk the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.\nReply exactly as:\nQ: <question>\nA: <answer>",
-        "prompt_hash": "22e2fb4a679c8fce71eeae6c7fdfdfdf6993858ec2f8f2df66b4fa8b2a590c4c",
-        "output": "Q: Does the iPhone 17 Pro's battery capacity align with its high performance score given the current market trend for larger batteries in flagship devices?\nA: The spec sheet lists a battery score of 80/100, which is lower than the camera (92/100) and performance (95/100) scores, suggesting that despite the high-performance A-series chip, the device may have reduced battery capacity compared to previous generations or competitors.",
-        "output_hash": "ef4ffa58c409e2fd75f1e35699db1d84cb96fdf7e32ab69ea8dd3b1aa8031bce",
-        "prev": "e379bfb66d92379b21e3b1ebcae8ab7d7521d44ba5b152f57b0bfcf63da2faed",
-        "hash": "e5f0350b993944a7ad3c4805c751061286c5bbe408159bb7427d1b116fe0fab5"
-      },
-      {
-        "kind": "research",
-        "product": "p2",
-        "round": 1,
-        "prompt": "You are a neutral product researcher. Product: Pixel 10 Pro. Spec sheet: camera: 93/100, battery: 82/100, performance: 84/100, price: $999.\nBuyer priorities (weights): {\"battery\":0.25,\"camera\":0.3,\"performance\":0.2,\"price\":0.25}.\nNotes so far: none.\nAsk the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.\nReply exactly as:\nQ: <question>\nA: <answer>",
-        "prompt_hash": "1d444c2b46447050af9401bd896b800213693675d5aaaeccc1bcdf3d4778ed28",
-        "output": "Q: Does the Pixel 10 Pro support fast charging to reach a full battery in under an hour?\nA: The spec sheet indicates a strong battery score of 82/100, but it does not explicitly list charging speed; however, based on widely known facts about the Google Pixel series, this device typically supports Super Fast Charging capable of reaching approximately 50% capacity in roughly 30 minutes.",
-        "output_hash": "4fbc2d1d6b6d887cc9197dfc30f980d103038298fe7be9d074e937c8d500d3c8",
-        "prev": "e5f0350b993944a7ad3c4805c751061286c5bbe408159bb7427d1b116fe0fab5",
-        "hash": "24d6b3592b61c7a054cf25a8f3c72955fbb71986921a539f900d6e625e998b97"
-      },
-      {
-        "kind": "research",
-        "product": "p2",
-        "round": 2,
-        "prompt": "You are a neutral product researcher. Product: Pixel 10 Pro. Spec sheet: camera: 93/100, battery: 82/100, performance: 84/100, price: $999.\nBuyer priorities (weights): {\"battery\":0.25,\"camera\":0.3,\"performance\":0.2,\"price\":0.25}.\nNotes so far: Q: Does the Pixel 10 Pro support fast charging to reach a full battery in under an hour? A: The spec sheet indicates a strong battery score of 82/100, but it does not explicitly list charging speed; however, based on widely known facts about the Google Pixel series, this device typically supports Super Fast Charging capable of reaching approximately 50% capacity in roughly 30 minutes..\nAsk the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.\nReply exactly as:\nQ: <question>\nA: <answer>",
-        "prompt_hash": "3b89df96b8f0b21136255f1e9b919c07fca584a23bb111b7aa1ef66abed3462a",
-        "output": "Q: Does the Pixel 10 Pro support wireless charging?\nA: The provided spec sheet does not explicitly mention wireless charging capabilities, but based on widely known facts about the Google Pixel series, this device typically supports both wired Super Fast Charging and wireless charging.",
-        "output_hash": "10f55ad5dfc1c04c358daeefb7d80dc2a55909af104b0077b71ebfe7e3926b7c",
-        "prev": "24d6b3592b61c7a054cf25a8f3c72955fbb71986921a539f900d6e625e998b97",
-        "hash": "44161b5df4878fd1a1b1d91f3c751a2c619ed46226571dcff4c39c7e1e9260a0"
-      },
-      {
-        "kind": "brief",
-        "prompt": "You are a neutral shopping assistant. The buyer's priorities: {\"battery\":0.25,\"camera\":0.3,\"performance\":0.2,\"price\":0.25}.\nShortlist (from an audited decision model) with research notes:\n- OnePlus 15 (camera: 86/100, battery: 93/100, performance: 90/100, price: $899): Q: Does the OnePlus 15 support wireless charging speeds comparable to its flagship competitors? A: Yes, based on current industry standards for devices with a 93/100 battery score and high performance ratings, it is expected to support fast wireless charging (likely 80W or higher), though specific wattage isn't explicitly detailed in the provided spec sheet. Q: What is the specific price point for the OnePlus 15 in the US market? A: The provided spec sheet lists a price of $899, but this figure does not account for potential regional taxes or carrier subsidies that could affect the final cost.\n- iPhone 17 Pro (camera: 92/100, battery: 80/100, performance: 95/100, price: $1099): Q: Does the iPhone 17 Pro support wireless charging speeds exceeding 50W? A: The spec sheet does not list specific charging wattage, but based on widely known facts about Apple's current lineup, the device likely supports up to 25W MagSafe or 30W Pegasus charging, which is lower than the 50W+ speeds found in some Android competitors. Q: Does the iPhone 17 Pro's battery capacity align with its high performance score given the current market trend for larger batteries in flagship devices? A: The spec sheet lists a battery score of 80/100, which is lower than the camera (92/100) and performance (95/100) scores, suggesting that despite the high-performance A-series chip, the device may have reduced battery capacity compared to previous generations or competitors.\n- Pixel 10 Pro (camera: 93/100, battery: 82/100, performance: 84/100, price: $999): Q: Does the Pixel 10 Pro support fast charging to reach a full battery in under an hour? A: The spec sheet indicates a strong battery score of 82/100, but it does not explicitly list charging speed; however, based on widely known facts about the Google Pixel series, this device typically supports Super Fast Charging capable of reaching approximately 50% capacity in roughly 30 minutes. Q: Does the Pixel 10 Pro support wireless charging? A: The provided spec sheet does not explicitly mention wireless charging capabilities, but based on widely known facts about the Google Pixel series, this device typically supports both wired Super Fast Charging and wireless charging.\nWrite a short brief: for each option, one line on who it suits best and one trade-off. Do not pick for the buyer; end with one sentence on what single factor should decide it.",
-        "prompt_hash": "70fa8d151dd2a26083f78952dd3fafca8d9e161cdb029add9d905c588d02cddd",
-        "output": "The OnePlus 15 suits buyers prioritizing balanced high performance and battery life, trading off a premium price point for solid value. The iPhone 17 Pro fits users who demand top-tier processing power and camera quality, sacrificing significant battery endurance and charging speed for ecosystem integration. The Pixel 10 Pro is ideal for those seeking excellent photography and reliable software support, while accepting slower charging rates and moderate performance metrics. The buyer's specific weightings should ultimately decide the final choice.",
-        "output_hash": "ae695e33c48b21b9f2cf33cac871a1372858bfb4552fbd3014cf8331f68e0e94",
-        "prev": "44161b5df4878fd1a1b1d91f3c751a2c619ed46226571dcff4c39c7e1e9260a0",
-        "hash": "046a67dd9370d4cf6dc978e12b5ee1af89ce33055146cbc75fb11214fac74e02"
-      }
-    ],
-    "chain_head": "046a67dd9370d4cf6dc978e12b5ee1af89ce33055146cbc75fb11214fac74e02"
-  },
   "public_key": "y3ISNyIxEKiqIzrw27x8oF7dGuefcTapKfCQ5Sx1ES0",
-  "receipt_hash": "66497a0ceb076e0b846a97aedc2c3a5062ff699703ccb61391c28314eb0d1889",
-  "signature": "5B9TMFWzw7Z1IOum4UfSdPq1DDDBX8aw5u6l83/RNLWpn6tm/sXfXGCtaoKatpPxInPn1yQPNOkvEjExs5kUAw=="
+  "receipt_hash": "1c61fb99c17a6adf8023257aef45aa1e840c899af6b5ef27d089fbbf0ce2de10",
+  "signature": "u7iLfK9TWf4vuxEH+j4d3EwOLcSrvQPEexa+qMSugaJtFYYEY+JvGSnreayEL2E8YFQxEvWeM7owHXsCxaccBw=="
 }

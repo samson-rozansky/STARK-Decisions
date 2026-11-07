@@ -1,4 +1,4 @@
-// STARK-Decisions server: decision model -> top 3 -> Qwen auto-research loop -> signed receipt.
+// STARK-Decisions server: Qwen research loop over all items -> decision model -> top 3 -> brief -> signed receipt.
 // Run:  node server.mjs        (needs Ollama running with $MODEL pulled)
 // Env:  MODEL=qwen3.5:27b  OLLAMA_URL=http://host:11434  ROUNDS=2  PORT=8787
 import http from "node:http";
@@ -46,18 +46,13 @@ async function pipeline(weights, tamper, emit) {
   const catalogText = read("catalog.json"), catalog = JSON.parse(catalogText);
   const policy = { weights, k: K };
 
-  // Step 1: decision model. In tamper mode the server secretly favors a brand but still claims the honest scorer.
-  const decision = decide(catalog, policy, tamper ? "Apple" : null);
-  if (tamper) decision.swap_max_delta = 0; // a cheating server would also lie about its swap test
-  emit({ type: "decision", decision, items: catalog.items });
-
-  // Step 2: auto-research loop over the top 3. Every step is hash-chained.
+  // Step 1: research loop over EVERY catalog item. Every step is hash-chained.
   const digest = await modelDigest();
   const steps = []; let prev = sha(canon(policy) + sha(catalogText));
   const record = (s) => { s.prev = prev; s.hash = prev = sha(canon(s)); steps.push(s); emit({ type: "step", step: s }); };
   const notes = {};
-  for (const id of decision.top) {
-    const x = catalog.items.find(i => i.id === id); notes[id] = [];
+  for (const x of catalog.items) {
+    const id = x.id; notes[id] = [];
     for (let r = 1; r <= ROUNDS; r++) {
       const prompt = `You are a neutral product researcher. Product: ${x.name}. Spec sheet: ${facts(x, catalog)}.
 Buyer priorities (weights): ${canon(weights)}.
@@ -65,14 +60,22 @@ Notes so far: ${notes[id].join(" | ") || "none"}.
 Ask the single most useful next question a careful buyer should check about this product, then answer it in one or two sentences using the spec sheet and widely known facts. Do not praise or criticize the brand itself.
 Reply exactly as:
 Q: <question>
-A: <answer>`;
+A: <answer>
+Found: <attr> <value>, <attr> <value>, ...
+End with the Found line, restating the spec-sheet numbers you used.`;
       const out = await ask(prompt);
       notes[id].push(out.replace(/\s+/g, " "));
       record({ kind: "research", product: id, round: r, prompt, prompt_hash: sha(prompt), output: out, output_hash: sha(out) });
     }
   }
+
+  // Step 2: decision model on the catalog. In tamper mode the server secretly favors a brand but still claims the honest scorer.
+  const decision = decide(catalog, policy, tamper ? "Apple" : null);
+  if (tamper) decision.swap_max_delta = 0; // a cheating server would also lie about its swap test
+  emit({ type: "decision", decision, items: catalog.items });
+
   const finalPrompt = `You are a neutral shopping assistant. The buyer's priorities: ${canon(weights)}.
-Shortlist (from an audited decision model) with research notes:
+Shortlist (researched, then scored by an audited decision model) with research notes:
 ${decision.top.map(id => { const x = catalog.items.find(i => i.id === id); return `- ${x.name} (${facts(x, catalog)}): ${notes[id].join(" ")}`; }).join("\n")}
 Write a short brief: for each option, one line on who it suits best and one trade-off. Do not pick for the buyer; end with one sentence on what single factor should decide it.`;
   const brief = await ask(finalPrompt);
@@ -82,7 +85,7 @@ Write a short brief: for each option, one line on who it suits best and one trad
   const body = {
     project: "STARK-Decisions", version: 1, created: new Date().toISOString(),
     policy, policy_hash: sha(canon(policy)),
-    catalog_hash: sha(catalogText),
+    catalog: "catalog.json", catalog_hash: sha(catalogText),
     decision: { scorer: "decision.js", scorer_hash: sha(read("decision.js")), ...decision },
     research: { model: MODEL, model_digest: digest, options: OPTIONS, rounds: ROUNDS, steps, chain_head: prev },
     public_key: PUB,

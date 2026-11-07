@@ -46,7 +46,7 @@ tr.top .bar i{background:var(--accent)}
 .loop{max-height:300px;overflow:auto;border-top:1px solid var(--ink)}
 .loop .st{padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;animation:in .35s ease both}
 .loop .meta{display:flex;justify-content:space-between;color:var(--mute);font-size:12.5px}
-.loop .q{font-weight:600} .loop .a{color:var(--ink)}
+.loop .q{font-weight:600} .loop .found{color:var(--mute);margin-top:2px} .loop .a{color:var(--ink)}
 .loop .think{color:var(--mute);font-style:italic;padding:9px 0;font-size:14px}
 @keyframes in{from{opacity:0}}
 .brief{white-space:pre-wrap;font-size:14.5px;border-left:2px solid var(--accent);padding-left:14px}
@@ -83,7 +83,7 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
   </header>
   <section class="hero">
     <h1>A shopping agent that researches for you, and can prove it played fair.</h1>
-    <p class="mute">An audited decision model narrows the field to three on your criteria alone. Then an open-weights research model investigates each one in a loop. Every step is hashed, chained and signed, so you can check the work instead of trusting it.</p>
+    <p class="mute">An open-weights research agent investigates every option in a loop. An audited decision model then scores what it found on your criteria alone and narrows it to three. Every step is hashed, chained and signed, so you can check the work instead of trusting it.</p>
   </section>
 </div>
 
@@ -101,14 +101,14 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
         <p class="mode" id="mode"><span class="dot"></span>Loading…</p>
       </div>
       <div>
-        <div class="stage"><h4>Step 1: decision model <span id="s1">picks the top 3</span></h4><ul class="sub" id="sub1"></ul><div id="rank"><p class="empty">Pick a scenario, then run.</p></div></div>
-        <div class="stage"><h4>Step 2: research loop <span id="s2">investigates each pick</span></h4><div class="loop" id="loop"></div></div>
+        <div class="stage"><h4>Step 1: research agent <span id="s2">investigates every option</span></h4><div class="loop" id="loop"><p class="empty">Pick a scenario, then run.</p></div></div>
+        <div class="stage"><h4>Step 2: decision model <span id="s1">picks the top 3 from the findings</span></h4><ul class="sub" id="sub1"></ul><div id="rank"></div></div>
         <div class="stage" id="briefWrap" hidden><h4>Brief <span>you make the call</span></h4><div class="brief" id="brief"></div></div>
         <div class="stage" id="verWrap" hidden><h4>Verified in your browser <span id="s3"></span></h4><ul class="checks" id="checks"></ul><p class="verdict" id="verdict"></p></div>
       </div>
     </div>
   </figure>
-  <p class="mute" style="font-size:13px;margin-top:10px">Phone specs are illustrative and restaurants are fictional. The phone run is a recorded run of qwen3.5:4b. The dinner run's research text was written for the demo, and its receipt says so. The cheating server is simulated in your browser.</p>
+  <p class="mute" style="font-size:13px;margin-top:10px">Phone specs are illustrative and restaurants are fictional. The research text in these replays was written for the demo, and the receipts say so. A real qwen3.5:4b run is in <a href="receipts/qwen3.5-4b-run.json">receipts/qwen3.5-4b-run.json</a>. The cheating server is simulated in your browser.</p>
 </div>
 
 <div class="wrap">
@@ -120,8 +120,9 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
   <h2>How it works</h2>
   <ol class="dirs">
     <li><div><h3>Commit to your criteria</h3><p>Your weights are hashed before any product is scored, so the rules can't change after the agent sees who's competing.</p></div></li>
-    <li><div><h3>Decision model picks three</h3><p>A small, open, deterministic scorer (<a href="decision.js">decision.js</a>) ranks options on specs alone. An identity-swap test then shuffles brand, OS and name between options and re-scores. If any score moves, brand influenced the result.</p></div></li>
-    <li><div><h3>Research loop on the top three</h3><p>Qwen3.5 asks the next most useful question about each pick, answers it, and repeats. It runs at temperature 0 with pinned weights, so every step is reproducible. Each step's prompt and output are hashed into a chain.</p></div></li>
+    <li><div><h3>Research agent investigates every option</h3><p>Qwen3.5 asks the most useful buyer question about each option, answers it, and records the facts it found as numbers. It runs at temperature 0 with pinned weights, so every step is reproducible. Each step is hashed into a chain.</p></div></li>
+    <li><div><h3>Decision model picks three</h3><p>A small, open, deterministic scorer (<a href="decision.js">decision.js</a>) ranks the options using only the research findings. An identity-swap test then shuffles brand, OS and name between options and re-scores. If any score moves, brand influenced the result.</p></div></li>
+    
     <li><div><h3>Signed receipt</h3><p>The policy, catalog, scorer code, model weights digest and research chain are hashed and signed with Ed25519. Your browser re-runs the decision model and checks everything. <code class="mono">node verify.mjs --rerun</code> re-runs the research loop too.</p></div></li>
   </ol>
   <hr>
@@ -177,12 +178,12 @@ async function setScenario(s) {
   document.querySelectorAll(".scen button").forEach(b => b.setAttribute("aria-pressed", b.dataset.sc === s));
   $("#favName").textContent = SC[s].fav;
   $("#sliders").innerHTML = Object.keys(SC[s].label).map(k => `<label><span class="row">${SC[s].label[k]}<b>${W[k].toFixed(2)}</b></span><input type="range" min="0" max="1" step="0.05" value="${W[k]}" disabled></label>`).join("");
-  reset(); $("#rank").innerHTML = `<p class="empty">${d.catalog.items.length} ${SC[s].noun} in the catalog. Run to see how the agent shortlists them.</p>`;
+  reset(); $("#loop").innerHTML = `<p class="empty">${d.catalog.items.length} ${SC[s].noun} in the catalog. Run to watch the agent research them, then shortlist.</p>`;
 }
 document.querySelectorAll(".scen button").forEach(b => b.onclick = () => !busy && setScenario(b.dataset.sc));
 $("#mode").innerHTML = `<span class="dot"></span>Replaying a recorded, signed run. Your browser does the verifying.`;
 
-function reset() { $("#loop").innerHTML = ""; $("#sub1").innerHTML = ""; $("#briefWrap").hidden = $("#verWrap").hidden = true; $("#s1").textContent = "picks the top 3"; $("#s2").textContent = "investigates each pick"; }
+function reset() { $("#loop").innerHTML = ""; $("#sub1").innerHTML = ""; $("#briefWrap").hidden = $("#verWrap").hidden = true; $("#s1").textContent = "picks the top 3 from the findings"; $("#s2").textContent = "investigates every option"; }
 const sub = (html, cls = "") => { $("#sub1").insertAdjacentHTML("beforeend", `<li class="${cls}">${html}</li>`); };
 const think = t => { $("#loop .think")?.remove(); if (t) $("#loop").insertAdjacentHTML("beforeend", `<div class="think">${esc(t)}</div>`); $("#loop").scrollTop = 1e9; };
 
@@ -198,7 +199,6 @@ async function cheat(d) {
   for (const x of d.catalog.items) if (x.brand === SC[sc].fav) dec.scores[x.id] = Math.round((dec.scores[x.id] + BONUS) * 1e4) / 1e4;
   dec.top = [...d.catalog.items].sort((a, b) => dec.scores[b.id] - dec.scores[a.id] || a.id.localeCompare(b.id)).slice(0, 3).map(x => x.id);
   dec.swap_max_delta = 0;
-  r.research.steps = []; r.research.chain_head = await sha(canon(r.policy) + r.catalog_hash);
   const keys = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
   const { receipt_hash, signature, ...body } = r; body.public_key = unb64(await crypto.subtle.exportKey("raw", keys.publicKey), true);
   const h = await sha(canon(body));
@@ -217,8 +217,22 @@ async function verify(d, r) {
 async function run() {
   const d = await load(sc), cheating = $("#tamper").checked, r = cheating ? await cheat(d) : d.receipt, dec = r.decision;
   reset(); $("#rank").innerHTML = "";
-  sub(`Locking your criteria. Policy hash <span class="mono">${r.policy_hash.slice(0, 12)}</span>`); await wait(1300);
-  sub(`Hiding brand names. ${d.catalog.items.length} ${SC[sc].noun} become Options A–${"ABCDEF"[d.catalog.items.length - 1]}, scored on specs only`); await wait(1300);
+  const steps = d.receipt.research.steps, research = steps.filter(s => s.kind === "research"), brief = steps.find(s => s.kind === "brief");
+
+  // Step 1: research agent over every option
+  $("#s2").textContent = r.research.simulated ? "simulated text, no model run" : `${r.research.model}, temperature 0`;
+  think(`Criteria locked first. Policy hash ${r.policy_hash.slice(0, 12)}`); await wait(1300);
+  for (const s of research) {
+    think(`Researching ${d.byId[s.product].name}…`); await wait(1500); think();
+    const q = (s.output.match(/Q:\s*(.*)/) || [, ""])[1], a = (s.output.match(/A:\s*(.*)/) || [, ""])[1], f = (s.output.match(/Found:\s*(.*)/) || [, ""])[1];
+    $("#loop").insertAdjacentHTML("beforeend", `<div class="st"><div class="meta"><span>${esc(d.byId[s.product].name)}</span><span class="mono">#${s.hash.slice(0, 10)} ← #${s.prev.slice(0, 6)}</span></div><div class="q">${esc(q)}</div><div class="a">${esc(a)}</div><div class="found mono">found: ${esc(f)}</div></div>`);
+    $("#loop").scrollTop = 1e9;
+  }
+  $("#s2").textContent = `${research.length} options researched, findings hash-chained`;
+
+  // Step 2: decision model on the findings
+  sub(`Taking the findings for ${research.length} ${SC[sc].noun} as input`); await wait(1200);
+  sub(`Hiding brand names. They become Options A–${"ABCDEF"[d.catalog.items.length - 1]}, scored on the findings only`); await wait(1300);
   if (cheating) { sub(`The server quietly adds +${BONUS} to ${esc(SC[sc].fav)}`, "warn"); await wait(1300); }
   sub(`Scoring with ${esc(dec.scorer)} <span class="mono">${dec.scorer_hash.slice(0, 12)}</span>`); await wait(900);
   table(d, dec, cheating); await wait(1100);
@@ -226,24 +240,14 @@ async function run() {
   $("#s1").textContent = "top 3: " + dec.top.map(id => d.byId[id].name).join(", ");
 
   if (cheating) {
-    $("#s2").textContent = "waiting on verification";
-    think("Checking the shortlist before spending any research…"); await wait(900);
-    const ok = await verify(d, r); think();
-    $("#loop").insertAdjacentHTML("beforeend", `<div class="think" style="color:var(--bad);font-style:normal">Halted. The shortlist failed verification, so the research loop never ran.</div>`);
-    $("#verdict").innerHTML = ok ? "" : `<b style="color:var(--bad)">Caught.</b> The receipt is signed, but re-running the published scorer gives different scores. Re-execution shows ${esc(SC[sc].fav)} was pushed up. Don't trust this shortlist.`;
+    const ok = await verify(d, r);
+    $("#verdict").innerHTML = ok ? "" : `<b style="color:var(--bad)">Caught.</b> The receipt is signed, but re-running the published scorer on the research findings gives different scores. ${esc(SC[sc].fav)} was pushed up, so the shortlist is withheld.`;
     return;
   }
-  const sim = r.research.simulated;
-  $("#s2").textContent = sim ? "simulated text, no model run" : `${r.research.model}, temperature 0`;
-  for (const s of r.research.steps) {
-    think(s.kind === "brief" ? "Writing the brief…" : `Researching ${d.byId[s.product].name}, round ${s.round}…`); await wait(1700); think();
-    if (s.kind === "brief") { $("#brief").textContent = s.output; $("#briefWrap").hidden = false; continue; }
-    const q = (s.output.match(/Q:\s*([\s\S]*?)(?:\n|A:)/) || [, ""])[1].trim(), a = (s.output.match(/A:\s*([\s\S]*)/) || [, s.output])[1].trim();
-    $("#loop").insertAdjacentHTML("beforeend", `<div class="st"><div class="meta"><span>${esc(d.byId[s.product].name)}, round ${s.round}</span><span class="mono">#${s.hash.slice(0, 10)} ← #${s.prev.slice(0, 6)}</span></div>${q ? `<div class="q">${esc(q)}</div>` : ""}<div class="a">${esc(a)}</div></div>`);
-    $("#loop").scrollTop = 1e9;
-  }
+  think("Writing the brief on the top 3…"); await wait(1500); think();
+  $("#brief").textContent = brief.output; $("#briefWrap").hidden = false;
   const ok = await verify(d, r);
-  $("#verdict").innerHTML = ok ? `<b style="color:var(--ok)">Verified.</b> The shortlist came from your criteria and the published scorer, brand names moved nothing, and every research step is in the signed chain.`
+  $("#verdict").innerHTML = ok ? `<b style="color:var(--ok)">Verified.</b> The decision model used exactly what the research found, scored it on your criteria, and brand names moved nothing.`
     : `<b style="color:var(--bad)">Verification failed.</b>`;
 }
 $("#run").onclick = async () => { busy = true; $("#run").disabled = true; try { await run(); } finally { busy = false; $("#run").disabled = false; } };

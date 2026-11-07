@@ -28,6 +28,11 @@ export async function verifyReceipt(r, env) {
     if (s.prev !== prev || (await env.sha(canon(rest))) !== hash || (await env.sha(s.output)) !== s.output_hash || (await env.sha(s.prompt)) !== s.prompt_hash) chainOk = false;
     prev = hash;
   }
+  // The decision model's inputs must be exactly what the research found.
+  const cat = JSON.parse(env.catalogText), found = {};
+  for (const s of r.research.steps) { const m = s.kind === "research" && s.output.match(/Found:\s*(.*)/); if (m) found[s.product] = Object.fromEntries(m[1].split(",").map(p => p.trim().split(/\s+/)).map(([k, v]) => [k, +String(v).replace(/[$,]/g, "")])); }
+  const inputsOk = cat.items.every(x => found[x.id] && cat.attributes.every(a => found[x.id][a] === x[a]));
+  if (r.order === "research-then-decide") add("Decision inputs match research findings", inputsOk, `${Object.keys(found).length} of ${cat.items.length} options researched`);
   add("Research loop hash chain intact", chainOk && prev === r.research.chain_head, `${r.research.steps.length} steps`);
   if (r.research.simulated) add("Research text labelled simulated (no model run)", true, "demo");
   else add("Model weights pinned", /^[0-9a-f]{64}$/.test(r.research.model_digest || ""), `${r.research.model} @ ${(r.research.model_digest || "").slice(0, 12)}…`);

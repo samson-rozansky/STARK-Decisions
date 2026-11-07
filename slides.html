@@ -190,7 +190,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
     </div>
     <div class="col">
       <h3>Your choice</h3>
-      <p>The agent shortlists three and explains each. You decide.</p>
+      <p>The agent researches every option, scores them, and shortlists three with a short brief. You decide.</p>
     </div>
   </div>
 </section>
@@ -199,7 +199,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 <section class="slide" data-title="How it works">
   <h2 style="margin-bottom:32px">Two steps, one receipt.</h2>
   <figure>
-  <svg viewBox="0 0 1280 440" width="100%" role="img" aria-label="Pipeline: committed criteria go into a deterministic decision model that picks a top three, a research loop investigates each, and everything is hashed into a signed receipt; both models are designed to get a zero-knowledge proof">
+  <svg viewBox="0 0 1280 440" width="100%" role="img" aria-label="Pipeline: a research loop studies every option and extracts the facts as numbers, a deterministic decision model scores them on the committed criteria and picks a top three, and everything is hashed into a signed receipt; both models are designed to get a zero-knowledge proof">
     <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#262722"/></marker></defs>
     <g font-family="Source Serif 4, Georgia, serif" fill="#262722">
       <!-- criteria -->
@@ -213,25 +213,26 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
       <!-- step 1 -->
       <rect x="260" y="20" width="370" height="230" fill="#f7f6f2" stroke="#262722"/>
       <text x="284" y="60" font-size="18" fill="#6b6b62">Step 1</text>
-      <text x="284" y="92" font-size="26" font-weight="600">Decision model</text>
-      <text x="284" y="128" font-size="19">Small, open, deterministic scorer</text>
-      <text x="284" y="160" font-size="19" fill="#6b6b62">Brand names hidden</text>
-      <text x="284" y="188" font-size="19" fill="#6b6b62">Scored on specs only</text>
-      <text x="284" y="216" font-size="19" fill="#6b6b62">Identity swap: any score moves?</text>
-      <text x="284" y="240" font-size="19" fill="#b4442c">  → bias flagged</text>
+      <text x="284" y="92" font-size="26" font-weight="600">Research loop</text>
+      <text x="284" y="128" font-size="19">Qwen3.5-27B, open weights</text>
+      <text x="284" y="160" font-size="19" fill="#6b6b62">Every option, facts as numbers</text>
+      <text x="284" y="188" font-size="19" fill="#6b6b62">question → finding, in rounds</text>
+      <text x="284" y="216" font-size="19" fill="#6b6b62">Temperature 0</text>
+      <text x="284" y="240" font-size="19" fill="#6b6b62">Each step hashed into a chain</text>
       <line x1="630" y1="135" x2="682" y2="135" stroke="#262722" marker-end="url(#ar)"/>
-      <text x="636" y="122" font-size="17" fill="#d9683b">top 3</text>
+      <text x="636" y="122" font-size="17" fill="#d9683b">facts</text>
 
       <!-- step 2 -->
       <rect x="690" y="20" width="350" height="230" fill="#f7f6f2" stroke="#262722"/>
       <text x="714" y="60" font-size="18" fill="#6b6b62">Step 2</text>
-      <text x="714" y="92" font-size="26" font-weight="600">Research loop</text>
-      <text x="714" y="128" font-size="19">Qwen3.5-27B, open weights</text>
-      <text x="714" y="160" font-size="19" fill="#6b6b62">question → finding →</text>
-      <text x="714" y="188" font-size="19" fill="#6b6b62">next question, in rounds</text>
-      <text x="714" y="216" font-size="19" fill="#6b6b62">Temperature 0</text>
-      <text x="714" y="240" font-size="19" fill="#6b6b62">Each step hashed into a chain</text>
+      <text x="714" y="92" font-size="26" font-weight="600">Decision model</text>
+      <text x="714" y="128" font-size="19">Small, open, deterministic scorer</text>
+      <text x="714" y="160" font-size="19" fill="#6b6b62">Brand names hidden</text>
+      <text x="714" y="188" font-size="19" fill="#6b6b62">Scored on your criteria</text>
+      <text x="714" y="216" font-size="19" fill="#6b6b62">Identity swap: any score moves?</text>
+      <text x="714" y="240" font-size="19" fill="#b4442c">  → bias flagged</text>
       <line x1="1040" y1="135" x2="1092" y2="135" stroke="#262722" marker-end="url(#ar)"/>
+      <text x="1046" y="122" font-size="17" fill="#d9683b">top 3</text>
 
       <!-- you -->
       <rect x="1100" y="40" width="180" height="190" fill="#f7f6f2" stroke="#dcdad2"/>
@@ -240,8 +241,8 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
       <text x="1120" y="142" font-size="19" fill="#6b6b62">each explained</text>
 
       <!-- receipt bar -->
-      <text x="284" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (zkML, e.g. EZKL)</text>
-      <text x="714" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (FlashProve-style)</text>
+      <text x="284" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (FlashProve-style)</text>
+      <text x="714" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (zkML, e.g. EZKL)</text>
       <line x1="445" y1="292" x2="445" y2="318" stroke="#dcdad2"/>
       <line x1="865" y1="292" x2="865" y2="318" stroke="#dcdad2"/>
       <line x1="100" y1="230" x2="100" y2="318" stroke="#dcdad2"/>
@@ -261,7 +262,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
     <tr><th>Threat</th><th>Defense</th><th>Today</th></tr>
     <tr><td>Criteria changed after seeing the options</td><td>Criteria hashed and committed before scoring</td><td class="ok">Checked</td></tr>
     <tr><td>Scorer prefers a brand</td><td>Brands hidden; identity swap re-scores with names shuffled</td><td class="ok">Checked</td></tr>
-    <tr><td>Different scorer code in production</td><td>Code hash in receipt; anyone re-executes it in the browser</td><td class="ok">Checked</td></tr>
+    <tr><td>Different scorer code in production</td><td>Code hash in receipt; anyone re-executes it in the browser, and its inputs must match the research findings</td><td class="ok">Checked</td></tr>
     <tr><td>Receipt or research edited afterward</td><td>Ed25519 signature; research steps hash-chained</td><td class="ok">Checked</td></tr>
     <tr><td>Research model swapped for a biased one</td><td>Weights digest is signed; the ZK proof is designed, not built</td><td class="acc">Next: ZK proof</td></tr>
     <tr><td>Catalog specs or prices are wrong</td><td>Catalog hash shows what was used, not that it's true</td><td class="bad">Out of scope</td></tr>
@@ -297,8 +298,8 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
   <div class="cols c2" style="gap:80px">
     <div class="col">
       <h3>Built</h3>
-      <p style="margin-bottom:14px">The full pipeline is implemented on GitHub: criteria commitment, blind scoring, identity-swap test, research loop, hash chain, Ed25519 receipt, in-browser verifier.</p>
-      <p style="margin-bottom:14px">Not built yet: the ZK proofs. Today step 2 is verified by re-running it on pinned weights at temperature 0, plus the signed hash chain.</p>
+      <p style="margin-bottom:14px">The full pipeline is implemented on GitHub: criteria commitment, research loop, hash chain, blind scoring on the findings, identity-swap test, Ed25519 receipt, in-browser verifier.</p>
+      <p style="margin-bottom:14px">Not built yet: the ZK proofs. Today step 1 is verified by re-running it on pinned weights at temperature 0, plus the signed hash chain.</p>
     </div>
     <div class="col">
       <h3>The catch</h3>
@@ -311,8 +312,8 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 <section class="slide" data-title="Roadmap">
   <h2>Next: a ZK proof for both steps</h2>
   <ol class="list">
-    <li><div>Step 1, the scorer <span>: zkML tools like EZKL make a proof practical today for a small model.</span></div></li>
-    <li><div>Step 2, the research model <span>: a FlashProve-style proof of inference shows the committed weights produced the output without revealing them. Anthropic's research prototype (Nov 2026) is hash-based (STARK-family) at about 70–95x GPU cost.</span></div></li>
+    <li><div>Step 1, the research model <span>: a FlashProve-style proof of inference shows the committed weights produced the output without revealing them. Anthropic's research prototype (Nov 2026) is hash-based (STARK-family) at about 70–95x GPU cost.</span></div></li>
+    <li><div>Step 2, the scorer <span>: zkML tools like EZKL make a proof practical today for a small model.</span></div></li>
     <li><div>Public transparency log <span>: receipts are appended to it, so a platform can't show auditors one model and users another.</span></div></li>
     <li><div>Merchant dashboard <span>: each lost decision, the reason, and the receipt to check it.</span></div></li>
   </ol>
