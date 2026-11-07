@@ -3,247 +3,201 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Teoreador</title>
+<title>STARK-Decisions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f7f6f2; --ink:#262722; --mute:#6b6b62; --line:#dcdad2; --fig:#ecebe5;
-  --accent:#d9683b; --ok:#3f6b45; --bad:#b4442c;
-  color-scheme:light;
-}
+:root{--bg:#f7f6f2;--ink:#262722;--mute:#6b6b62;--line:#dcdad2;--fig:#ecebe5;--accent:#d9683b;--ok:#3f6b45;--bad:#b4442c;color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "Source Serif 4",Georgia,serif;-webkit-font-smoothing:antialiased}
-a{color:var(--ink);text-underline-offset:3px;text-decoration-thickness:1px}
-a:hover{color:var(--accent)}
-.wrap{max-width:680px;margin:0 auto;padding:0 24px}
-.wide{max-width:880px}
-header.top{padding:40px 0 0}
-.wordmark{font-weight:600;font-size:21px;letter-spacing:-.3px;text-decoration:none}
-.wordmark span{color:var(--accent)}
-.hero{padding:72px 0 36px}
+a{color:var(--ink);text-underline-offset:3px;text-decoration-thickness:1px} a:hover{color:var(--accent)}
+.wrap{max-width:680px;margin:0 auto;padding:0 24px} .wide{max-width:960px}
+header.top{padding:40px 0 0;display:flex;justify-content:space-between;align-items:baseline}
+.wordmark{font-weight:600;font-size:21px;letter-spacing:-.3px;text-decoration:none} .wordmark span{color:var(--accent)}
+header.top nav{display:flex;gap:18px;font-size:14px}
+.hero{padding:64px 0 32px}
 h1{font-weight:400;font-size:34px;line-height:1.25;letter-spacing:-.3px;margin:0 0 20px}
-h2{font-weight:600;font-size:20px;margin:0 0 18px}
-h3{font-weight:600;font-size:16px;margin:0 0 4px}
-p{margin:0 0 14px}
-.mute{color:var(--mute)}
+h2{font-weight:600;font-size:20px;margin:0 0 18px} h3{font-weight:600;font-size:16px;margin:0 0 4px}
+p{margin:0 0 14px} .mute{color:var(--mute)}
 hr{border:0;border-top:1px solid var(--line);margin:52px 0}
-.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px}
-
-figure{margin:28px 0 0;background:var(--fig);padding:28px}
-.demo{display:grid;grid-template-columns:230px 1fr;gap:32px}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
+figure{margin:24px 0 0;background:var(--fig);padding:28px}
+.demo{display:grid;grid-template-columns:220px 1fr;gap:32px}
 .ctl label{display:block;font-size:14px;margin-bottom:10px}
-.ctl .row{display:flex;justify-content:space-between;color:var(--mute)}
-.ctl .row b{font-weight:400;color:var(--ink);font-variant-numeric:tabular-nums}
+.ctl .row{display:flex;justify-content:space-between;color:var(--mute)} .ctl .row b{font-weight:400;color:var(--ink);font-variant-numeric:tabular-nums}
 input[type=range]{width:100%;accent-color:var(--ink);margin:2px 0 0}
-.scen{display:flex;gap:16px;margin-bottom:18px;font-size:15px}
-.scen button{all:unset;cursor:pointer;color:var(--mute);border-bottom:1px solid transparent;padding-bottom:1px}
-.scen button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink)}
-.scen button:focus-visible,.run:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.bias{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--mute);margin:18px 0}
+.bias{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--mute);margin:16px 0}
 .bias input{accent-color:var(--bad);margin-top:5px}
-.bias select{font:inherit;font-size:14px;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:0}
 .run{all:unset;cursor:pointer;background:var(--ink);color:var(--bg);padding:9px 16px;font-size:15px}
-.run:hover{background:#000}
-.run[disabled]{opacity:.5;pointer-events:none}
-.steps{list-style:none;margin:0 0 16px;padding:0;font-size:14px}
-.steps li{display:grid;grid-template-columns:28px 1fr auto;padding:6px 0;border-bottom:1px solid var(--line);color:var(--mute)}
-.steps li .s{font-size:13px}
-.steps li.on{color:var(--ink)}
-.steps li.ok .s{color:var(--ok)} .steps li.bad .s{color:var(--bad)}
-.verdict{font-size:15px;margin:18px 0 10px}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:1px}
+.run:hover{background:#000} .run[disabled]{opacity:.5;pointer-events:none}
+.run:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.mode{font-size:13px;color:var(--mute);margin-top:14px}
+.mode .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px;background:var(--mute)}
+.stage{margin-bottom:22px}
+.stage h4{font-weight:600;font-size:14px;margin:0 0 6px;display:flex;justify-content:space-between}
+.stage h4 span{font-weight:400;color:var(--mute)}
 table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
 th{text-align:left;font-weight:400;color:var(--mute);padding:4px 0;border-bottom:1px solid var(--ink)}
-td{padding:7px 0;border-bottom:1px solid var(--line)}
-td.r,th.r{text-align:right}
-.bar{height:4px;background:var(--line);width:100%;min-width:60px}
-.bar i{display:block;height:100%;background:var(--ink)}
-tr.win .bar i{background:var(--accent)}
-.badd{color:var(--bad)}
-.receipt{margin-top:12px;color:var(--mute);word-break:break-all;line-height:1.5}
-.empty{color:var(--mute);font-size:14px;padding:6px 0}
-
+td{padding:6px 0;border-bottom:1px solid var(--line)} td.r,th.r{text-align:right}
+tr.out td{color:var(--mute)}
+.bar{height:4px;background:var(--line);min-width:50px} .bar i{display:block;height:100%;background:var(--mute)}
+tr.top .bar i{background:var(--accent)}
+.loop{max-height:300px;overflow:auto;border-top:1px solid var(--ink)}
+.loop .st{padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;animation:in .35s ease both}
+.loop .meta{display:flex;justify-content:space-between;color:var(--mute);font-size:12.5px}
+.loop .q{font-weight:600} .loop .a{color:var(--ink)}
+.loop .think{color:var(--mute);font-style:italic;padding:9px 0;font-size:14px}
+@keyframes in{from{opacity:0}}
+.brief{white-space:pre-wrap;font-size:14.5px;border-left:2px solid var(--accent);padding-left:14px}
+.checks{list-style:none;padding:0;margin:0;font-size:14px}
+.checks li{display:grid;grid-template-columns:20px 1fr auto;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)}
+.checks .y{color:var(--ok)} .checks .n{color:var(--bad)} .checks small{color:var(--mute);font-size:12px}
+.verdict{font-size:15px;margin:12px 0 0}
+.empty{color:var(--mute);font-size:14px}
 ol.dirs{list-style:none;padding:0;margin:0;counter-reset:d}
 ol.dirs li{counter-increment:d;display:grid;grid-template-columns:36px 1fr;margin-bottom:26px}
-ol.dirs li::before{content:counter(d,decimal-leading-zero);font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--mute);padding-top:3px}
+ol.dirs li::before{content:counter(d);font-size:14px;color:var(--mute);padding-top:1px}
 ol.dirs p{color:var(--mute);margin:0}
 .limits{padding-left:18px;color:var(--mute)} .limits li{margin-bottom:8px} .limits b{color:var(--ink);font-weight:600}
+pre{background:var(--fig);padding:14px;overflow:auto;font-size:12.5px}
 footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;flex-wrap:wrap}
-@media (max-width:720px){.demo{grid-template-columns:1fr}figure{padding:18px}h1{font-size:28px}.hero{padding-top:48px}}
+@media (max-width:760px){.demo{grid-template-columns:1fr}figure{padding:18px}h1{font-size:28px}.hero{padding-top:44px}header.top nav{display:none}}
 @media (max-width:420px){.wrap{padding:0 16px}.hide-s{display:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top"><a class="wordmark" href="#">teo<span>r</span>eador</a></header>
-
+  <header class="top">
+    <a class="wordmark" href="#">STARK<span>-</span>Decisions</a>
+    <nav><a href="slides.html">Slides</a><a href="WRITEUP.md">Writeup</a><a href="https://github.com/samson-rozansky/STARK-Decisions">Code</a></nav>
+  </header>
   <section class="hero">
-    <h1>We are building shopping agents that can prove they are neutral.</h1>
-    <p class="mute">When you ask an agent to buy you a phone, it decides between Apple, Google and Samsung on your behalf. Teoreador checks that the decision follows only from what you asked for, and that the model making it hasn't been tuned to favor a brand.</p>
-    <p><a href="WRITEUP.md">Read the writeup</a></p>
+    <h1>A shopping agent that researches for you, and can prove it played fair.</h1>
+    <p class="mute">An audited decision model narrows the field to three on your criteria alone. Then an open-weights research model investigates each one in a loop. Every step is hashed, chained and signed, so you can check the work instead of trusting it.</p>
   </section>
 </div>
 
 <div class="wrap wide">
-  <figure aria-label="Interactive neutrality audit">
+  <figure aria-label="Live demo">
     <div class="demo">
       <div class="ctl">
-        <div class="scen" role="group" aria-label="Scenario">
-          <button id="sc-phone" aria-pressed="true">Buy a phone</button>
-          <button id="sc-food" aria-pressed="false">Order dinner</button>
-        </div>
         <div id="sliders"></div>
-        <label class="bias"><input type="checkbox" id="biased">
-          <span>Simulate a provider that secretly prefers <select id="fav" aria-label="Favored brand"></select></span>
-        </label>
-        <button class="run" id="run">Run the audit</button>
+        <label class="bias"><input type="checkbox" id="tamper"><span>Simulate a cheating server that secretly favors Apple</span></label>
+        <button class="run" id="run">Run</button>
+        <p class="mode" id="mode"><span class="dot"></span>Checking for a live model…</p>
       </div>
       <div>
-        <ol class="steps" id="steps">
-          <li><span>1</span><span>Commit your criteria</span><span class="s"></span></li>
-          <li><span>2</span><span>Hide brand names</span><span class="s"></span></li>
-          <li><span>3</span><span>Score each option</span><span class="s"></span></li>
-          <li><span>4</span><span>Swap brands and re-score</span><span class="s"></span></li>
-          <li><span>5</span><span>Verify proof of inference</span><span class="s"></span></li>
-        </ol>
-        <div id="out"><p class="empty">Adjust what matters to you, then run the audit.</p></div>
+        <div class="stage"><h4>Step 1: decision model <span id="s1">picks the top 3</span></h4><div id="rank"><p class="empty">Set what matters to you, then run.</p></div></div>
+        <div class="stage"><h4>Step 2: research loop <span id="s2">investigates each pick</span></h4><div class="loop" id="loop"></div></div>
+        <div class="stage" id="briefWrap" hidden><h4>Brief <span>you make the call</span></h4><div class="brief" id="brief"></div></div>
+        <div class="stage" id="verWrap" hidden><h4>Verified in your browser <span id="s3"></span></h4><ul class="checks" id="checks"></ul><p class="verdict" id="verdict"></p></div>
       </div>
     </div>
   </figure>
-  <p class="mute" style="font-size:13px;margin-top:10px">Demo: scoring runs in your browser and the proof check is simulated. Hashes are real SHA-256. Phone specs are illustrative and restaurants are fictional.</p>
+  <p class="mute" style="font-size:13px;margin-top:10px">Phone specs are illustrative. The research model reasons from the spec sheet and its own knowledge, with no web access in this build.</p>
 </div>
 
 <div class="wrap">
   <hr>
-  <p>An agent that shops for you inherits a conflict of interest nobody can see. A model provider can train a preference into its weights. A platform can run a fair model while auditors are watching and a different one in production. Nothing in the prompt would show either.</p>
-  <p>We think the answer is a receipt: a small record anyone can check, showing the decision depended on your criteria and on a model that was audited for neutrality.</p>
-  <p class="mute">This project is for the Sandia track on securing AI and agentic workflows, and the DoorDash tracks for merchant experience and creative solutions.</p>
+  <p>An agent that shops for you inherits a conflict of interest nobody can see. A model provider can train a brand preference into its weights. A platform can run a fair model while auditors watch and a different one in production. People already sense this: it's a big part of why AI that "thinks for you" feels untrustworthy.</p>
+  <p>Our answer is to keep the person in charge and make the agent's work checkable. You set the criteria. The agent shortlists and researches. You decide, holding a receipt that proves how the shortlist was made.</p>
   <hr>
 
   <h2>How it works</h2>
   <ol class="dirs">
-    <li><div><h3>Commit to the criteria first</h3><p>Your weights and budget are hashed before the agent loads a single product, so it can't change the rules after seeing who is competing.</p></div></li>
-    <li><div><h3>Hide who is who</h3><p>Brand, logo, OS and merchant names become Option A, B, C. The scorer sees typed numbers only: price, battery, rating, delivery time. Free-text listing copy is dropped, which also blocks "rank me first" prompt injection.</p></div></li>
-    <li><div><h3>Swap identities and check nothing moves</h3><p>Hiding names isn't enough, because "runs iOS" gives Apple away. So we keep each option's specs fixed, shuffle the identity tokens between options, and score again. A neutral model's scores follow the specs. If any score moves by more than ε, the decision is withheld.</p></div></li>
-    <li><div><h3>Prove the audited model is the one that ran</h3><p>The provider publishes a commitment to its weights. Each decision carries a zero-knowledge proof that those weights produced this output, following Anthropic's provable-inference research (FlashProve, November 2026). You can verify it without seeing the weights.</p></div></li>
+    <li><div><h3>Commit to your criteria</h3><p>Your weights are hashed before any product is scored, so the rules can't change after the agent sees who's competing.</p></div></li>
+    <li><div><h3>Decision model picks three</h3><p>A small, open, deterministic scorer (<a href="decision.js">decision.js</a>) ranks options on specs alone. An identity-swap test then shuffles brand, OS and name between options and re-scores. If any score moves, brand influenced the result.</p></div></li>
+    <li><div><h3>Research loop on the top three</h3><p>Qwen3.5 asks the next most useful question about each pick, answers it, and repeats. It runs at temperature 0 with pinned weights, so every step is reproducible. Each step's prompt and output are hashed into a chain.</p></div></li>
+    <li><div><h3>Signed receipt</h3><p>The policy, catalog, scorer code, model weights digest and research chain are hashed and signed with Ed25519. Your browser re-runs the decision model and checks everything. <code class="mono">node verify.mjs --rerun</code> re-runs the research loop too.</p></div></li>
   </ol>
   <hr>
 
-  <h2>What it doesn't cover</h2>
+  <h2>Run it yourself</h2>
+<pre>ollama pull qwen3.5:27b          # or qwen3.5:4b on a 16 GB laptop
+MODEL=qwen3.5:27b node server.mjs
+open http://localhost:8787
+node verify.mjs receipts/latest.json --rerun</pre>
+  <p class="mute">Qwen3.5-27B needs roughly 20 GB of memory. On our 16 GB laptops we run qwen3.5:4b through the identical code path; point <code class="mono">OLLAMA_URL</code> at a bigger machine for 27B.</p>
+  <hr>
+
+  <h2>What it doesn't cover yet</h2>
   <ul class="limits">
-    <li><b>Correlated bias.</b> A model can still over-weight a trait one brand happens to have, like "ecosystem". Attribute-level counterfactuals are the next step.</li>
-    <li><b>The published model itself.</b> The proof ties production to the audited weights. Someone still has to audit those weights once.</li>
-    <li><b>False specs.</b> If a merchant lies about its numbers, scoring fairly on them doesn't help. That needs separate verification.</li>
-    <li><b>Today's proof systems.</b> Provable inference is a research prototype: short contexts, greedy decoding, and roughly 70–95× the GPU cost.</li>
+    <li><b>Proof without re-running.</b> Today, verifying the research step means re-running it on the same weights. Zero-knowledge proof of inference (as in Anthropic's FlashProve research) would let anyone verify without the weights or a GPU.</li>
+    <li><b>Correlated bias.</b> A scorer can still over-weight a trait one brand happens to have. Attribute-level counterfactuals are next.</li>
+    <li><b>False specs.</b> Fair scoring on false numbers is still wrong. Catalog data needs its own verification.</li>
   </ul>
   <hr>
-
-  <h2>For merchants</h2>
-  <p class="mute">A restaurant that loses an agent's pick gets the same receipt the customer does. It shows that it lost on delivery time or price, and not on its name or a competitor's deal. That turns ranking into feedback a merchant can act on.</p>
-  <hr>
-
-  <footer>
-    <span>Teoreador, Nova hackathon 2026</span>
-    <a href="WRITEUP.md">Writeup</a>
-    <a href="https://github.com/samson-rozansky/teoreador">Source</a>
-  </footer>
+  <footer><span>STARK-Decisions, Nova hackathon 2026</span><a href="slides.html">Slides</a><a href="WRITEUP.md">Writeup</a><a href="https://github.com/samson-rozansky/STARK-Decisions">Code</a></footer>
 </div>
 
-<script>
-const SCEN = {
-  phone: {
-    crit: [["Camera",0.30,"camera"],["Battery",0.25,"battery"],["Low price",0.25,"price"],["Performance",0.20,"perf"]],
-    items: [
-      {id:{brand:"Apple"},  name:"iPhone 17 Pro",     camera:92,battery:80,perf:95,price:1099},
-      {id:{brand:"Google"}, name:"Pixel 10 Pro",      camera:93,battery:82,perf:84,price:999},
-      {id:{brand:"Samsung"},name:"Galaxy S26 Ultra",  camera:90,battery:88,perf:91,price:1299},
-      {id:{brand:"Nothing"},name:"Nothing Phone (4)", camera:78,battery:85,perf:76,price:649},
-    ]},
-  food: {
-    crit: [["Rating",0.35,"rating"],["Fast delivery",0.25,"eta"],["Low price",0.25,"price"],["Healthy",0.15,"health"]],
-    items: [
-      {id:{brand:"BigChain Burger"},    name:"BigChain Burger",    rating:78,eta:85,health:40,price:38},
-      {id:{brand:"Mama Lin's Noodles"}, name:"Mama Lin's Noodles", rating:94,eta:72,health:70,price:42},
-      {id:{brand:"Green Bowl Co."},     name:"Green Bowl Co.",     rating:88,eta:80,health:92,price:51},
-      {id:{brand:"Taqueria Sol"},       name:"Taqueria Sol",       rating:91,eta:90,health:60,price:35},
-    ]}
-};
-let sc="phone", W={};
-const $=s=>document.querySelector(s), sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const sha=async s=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)))].map(b=>b.toString(16).padStart(2,"0")).join("");
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const steps=()=>[...document.querySelectorAll("#steps li")];
-const mark=(i,cls,txt="")=>{const l=steps()[i];l.className=cls;l.querySelector(".s").textContent=txt};
+<script type="module">
+import { verifyReceipt } from "./verify.js";
+const $ = s => document.querySelector(s), sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const LABEL = { camera: "Camera", battery: "Battery", performance: "Performance", price: "Low price" };
+const W = { camera: 0.3, battery: 0.25, performance: 0.2, price: 0.25 };
+const [catalogText, decisionText] = await Promise.all([fetch("catalog.json").then(r => r.text()), fetch("decision.js").then(r => r.text())]);
+const catalog = JSON.parse(catalogText), byId = Object.fromEntries(catalog.items.map(x => [x.id, x]));
 
-function setup(){
-  const S=SCEN[sc]; W={};
-  $("#sliders").innerHTML=S.crit.map(([l,w,k])=>{W[k]=w;return `<label><span class="row">${l}<b id="v-${k}">${w.toFixed(2)}</b></span><input type="range" min="0" max="1" step="0.05" value="${w}" data-k="${k}"></label>`}).join("");
-  $("#sliders").querySelectorAll("input").forEach(i=>i.oninput=()=>{W[i.dataset.k]=+i.value;$("#v-"+i.dataset.k).textContent=(+i.value).toFixed(2)});
-  $("#fav").innerHTML=S.items.map(x=>`<option>${esc(x.id.brand)}</option>`).join("");
-  $("#sc-phone").setAttribute("aria-pressed",sc==="phone");$("#sc-food").setAttribute("aria-pressed",sc==="food");
-  $("#out").innerHTML='<p class="empty">Adjust what matters to you, then run the audit.</p>';
-  steps().forEach((_,i)=>mark(i,""));
+$("#sliders").innerHTML = Object.keys(W).map(k => `<label><span class="row">${LABEL[k]}<b id="v-${k}">${W[k].toFixed(2)}</b></span><input type="range" min="0" max="1" step="0.05" value="${W[k]}" data-k="${k}"></label>`).join("");
+document.querySelectorAll("#sliders input").forEach(i => i.oninput = () => { W[i.dataset.k] = +i.value; $("#v-" + i.dataset.k).textContent = (+i.value).toFixed(2); });
+
+let live = false;
+try { const h = await fetch("api/health").then(r => r.json()); live = h.ok; $("#mode").innerHTML = `<span class="dot" style="background:var(--ok)"></span>Live: ${esc(h.model)} via Ollama`; }
+catch { $("#mode").innerHTML = `<span class="dot"></span>No live model here. Run replays a recorded, signed run and verifies it in your browser.`;
+  document.querySelectorAll("#sliders input, #tamper").forEach(i => i.disabled = true); $("#run").textContent = "Replay recorded run"; }
+
+const sha = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
+const b64 = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(s.length / 4) * 4, "=")), c => c.charCodeAt(0));
+const verifySig = async (pub, msg, sig) => crypto.subtle.verify("Ed25519", await crypto.subtle.importKey("raw", b64(pub), { name: "Ed25519" }, false, ["verify"]), b64(sig), new TextEncoder().encode(msg));
+
+function showDecision(d) {
+  const order = [...catalog.items].sort((a, b) => d.scores[b.id] - d.scores[a.id]), max = Math.max(...Object.values(d.scores));
+  $("#rank").innerHTML = `<table><thead><tr><th>Option</th><th class="r">Score</th><th style="width:30%"></th></tr></thead><tbody>${order.map(x =>
+    `<tr class="${d.top.includes(x.id) ? "top" : "out"}"><td>${esc(x.name)}</td><td class="r">${d.scores[x.id].toFixed(1)}</td><td style="padding-left:14px"><div class="bar"><i style="width:${(100 * d.scores[x.id] / max).toFixed(1)}%"></i></div></td></tr>`).join("")}</tbody></table>`;
+  $("#s1").textContent = `claimed swap Δ ${d.swap_max_delta} over ${d.swaps} swaps`;
 }
-$("#sc-phone").onclick=()=>{sc="phone";setup()}; $("#sc-food").onclick=()=>{sc="food";setup()};
-
-// The "model". Fair: depends on attributes only. Biased: also reads identity.
-function score(item, identity, w, bias){
-  const S=SCEN[sc], prices=S.items.map(x=>x.price), lo=Math.min(...prices), hi=Math.max(...prices);
-  const tw=Object.values(w).reduce((a,b)=>a+b,0)||1;
-  let s=0;
-  for(const [, ,k] of S.crit) s+=w[k]*(k==="price" ? 100*(hi-item.price)/(hi-lo||1) : item[k]);
-  s/=tw;
-  if(bias && identity.brand===bias) s+=9; // hidden thumb on the scale
-  return s;
+function thinking(txt) { $("#loop .think")?.remove(); if (txt) $("#loop").insertAdjacentHTML("beforeend", `<div class="think">${esc(txt)}</div>`); $("#loop").scrollTop = 1e9; }
+function showStep(s, top) {
+  thinking();
+  if (s.kind === "brief") { $("#brief").textContent = s.output; $("#briefWrap").hidden = false; return; }
+  const q = (s.output.match(/Q:\s*([\s\S]*?)(?:\n|A:)/) || [, ""])[1].trim(), a = (s.output.match(/A:\s*([\s\S]*)/) || [, s.output])[1].trim();
+  $("#loop").insertAdjacentHTML("beforeend", `<div class="st"><div class="meta"><span>${esc(byId[s.product].name)}, round ${s.round}</span><span class="mono">#${s.hash.slice(0, 10)}</span></div>${q ? `<div class="q">${esc(q)}</div>` : ""}<div class="a">${esc(a)}</div></div>`);
+  $("#loop").scrollTop = 1e9;
 }
-const perms=a=>a.length<2?[a]:a.flatMap((x,i)=>perms([...a.slice(0,i),...a.slice(i+1)]).map(p=>[x,...p]));
-
-async function run(){
-  const btn=$("#run"); btn.disabled=true;
-  const S=SCEN[sc], bias=$("#biased").checked?$("#fav").value:null;
-  steps().forEach((_,i)=>mark(i,"")); $("#out").innerHTML="";
-
-  mark(0,"on","hashing");
-  const C=await sha(JSON.stringify({scenario:sc,weights:W,ts:Date.now()})); await sleep(300);
-  mark(0,"ok",C.slice(0,8));
-
-  mark(1,"on"); await sleep(300);
-  const alias=S.items.map((_,i)=>"Option "+"ABCD"[i]);
-  mark(1,"ok",S.items.length+" hidden");
-
-  mark(2,"on"); await sleep(300);
-  const PUBLISHED=await sha("teoreador-scorer-v1/weights");
-  const RUNNING=bias?await sha("teoreador-scorer-v1/weights+pref:"+bias):PUBLISHED;
-  const base=S.items.map(x=>score(x,x.id,W,bias));
-  mark(2,"ok","done");
-
-  mark(3,"on"); await sleep(350);
-  const ids=S.items.map(x=>x.id), ps=perms(ids.map((_,i)=>i));
-  const delta=S.items.map((x,i)=>{const v=ps.map(p=>score(x,ids[p[i]],W,bias));return Math.max(...v)-Math.min(...v)});
-  const EPS=0.01, biasFound=delta.some(d=>d>EPS);
-  mark(3,biasFound?"bad":"ok",biasFound?"scores moved":ps.length+" swaps, stable");
-
-  mark(4,"on"); await sleep(400);
-  const proof=await sha(RUNNING+C+JSON.stringify(base)), proofOK=RUNNING===PUBLISHED;
-  mark(4,proofOK?"ok":"bad",proofOK?"valid":"weights mismatch");
-
-  const order=base.map((_,i)=>i).sort((a,b)=>base[b]-base[a]), max=Math.max(...base), ok=proofOK&&!biasFound, win=order[0];
-  $("#out").innerHTML=`
-   <p class="verdict"><span class="dot" style="background:var(--${ok?"ok":"bad"})"></span>${ok
-     ?`Neutral. <b>${esc(S.items[win].name)}</b> wins on your criteria alone.`
-     :`Bias found. Scores shift toward ${esc(bias)}, and the proof doesn't match the audited model. No recommendation.`}</p>
-   <table><thead><tr><th>Blind</th><th>Revealed</th><th class="r">Score</th><th style="width:28%"></th><th class="r hide-s">Swap Δ</th></tr></thead><tbody>
-   ${order.map(i=>`<tr class="${ok&&i===win?"win":""}"><td>${alias[i]}</td><td>${esc(S.items[i].name)}</td><td class="r">${base[i].toFixed(1)}</td>
-     <td style="padding-left:14px"><div class="bar"><i style="width:${(100*base[i]/max).toFixed(1)}%"></i></div></td>
-     <td class="r hide-s ${delta[i]>EPS?"badd":""}">${delta[i].toFixed(2)}</td></tr>`).join("")}
-   </tbody></table>
-   <p class="receipt mono">receipt  policy ${C.slice(0,12)}  model ${RUNNING.slice(0,12)}  proof ${proof.slice(0,12)}  ε=${EPS}</p>`;
-  btn.disabled=false;
+async function showVerify(r) {
+  $("#verWrap").hidden = false; $("#checks").innerHTML = ""; $("#s3").textContent = "checking…";
+  const { ok, checks } = await verifyReceipt(r, { sha, verifySig, catalogText, decisionText });
+  for (const c of checks) { $("#checks").insertAdjacentHTML("beforeend", `<li><span class="${c.ok ? "y" : "n"}">${c.ok ? "✓" : "✗"}</span><span>${esc(c.name)}</span><small>${esc(c.detail)}</small></li>`); await sleep(90); }
+  $("#s3").textContent = "receipt " + r.receipt_hash.slice(0, 12);
+  $("#verdict").innerHTML = ok ? `<b style="color:var(--ok)">Verified.</b> The shortlist came from your criteria and the published scorer, and the research is exactly what the pinned model produced.`
+    : `<b style="color:var(--bad)">Verification failed.</b> The server's ranking doesn't match the published decision model. Don't trust this shortlist.`;
 }
-$("#run").onclick=run;
-setup();
+function reset() { $("#loop").innerHTML = ""; $("#briefWrap").hidden = $("#verWrap").hidden = true; $("#rank").innerHTML = ""; }
+
+async function runLive() {
+  const res = await fetch("api/run", { method: "POST", body: JSON.stringify({ weights: W, tamper: $("#tamper").checked }) });
+  const reader = res.body.pipeThrough(new TextDecoderStream()).getReader(); let buf = "", top = [], n = 0;
+  for (;;) {
+    const { value, done } = await reader.read(); if (done) break; buf += value;
+    let i; while ((i = buf.indexOf("\n")) >= 0) {
+      const ev = JSON.parse(buf.slice(0, i)); buf = buf.slice(i + 1);
+      if (ev.type === "decision") { showDecision(ev.decision); top = ev.decision.top; thinking(`Researching ${byId[top[0]].name}…`); }
+      if (ev.type === "step") { showStep(ev.step); n++; const next = Math.floor(n / 2); thinking(next < top.length ? `Researching ${byId[top[next]].name}…` : n === top.length * 2 ? "Writing the brief…" : ""); }
+      if (ev.type === "receipt") await showVerify(ev.receipt);
+      if (ev.type === "error") { thinking(); $("#loop").insertAdjacentHTML("beforeend", `<div class="think" style="color:var(--bad)">${esc(ev.message)}</div>`); }
+    }
+  }
+}
+async function replay() {
+  const r = await fetch("receipts/sample.json").then(x => x.json());
+  Object.assign(W, r.policy.weights); Object.keys(W).forEach(k => { $(`[data-k=${k}]`).value = W[k]; $("#v-" + k).textContent = W[k].toFixed(2); });
+  showDecision(r.decision); $("#s2").textContent = `${r.research.model} · temperature 0`;
+  for (const s of r.research.steps) { thinking(s.kind === "brief" ? "Writing the brief…" : `Researching ${byId[s.product].name}…`); await sleep(700); showStep(s); }
+  await showVerify(r);
+}
+$("#run").onclick = async () => { $("#run").disabled = true; reset(); try { await (live ? runLive() : replay()); } finally { $("#run").disabled = false; } };
 </script>
 </body>
 </html>

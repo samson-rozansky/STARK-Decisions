@@ -1,0 +1,12 @@
+{
+  "note": "Illustrative specs for demo purposes, not measured values. Scores 0-100, price in USD.",
+  "attributes": ["camera", "battery", "performance", "price"],
+  "items": [
+    {"id": "p1", "name": "iPhone 17 Pro",       "brand": "Apple",   "os": "iOS",     "camera": 92, "battery": 80, "performance": 95, "price": 1099},
+    {"id": "p2", "name": "Pixel 10 Pro",        "brand": "Google",  "os": "Android", "camera": 93, "battery": 82, "performance": 84, "price": 999},
+    {"id": "p3", "name": "Galaxy S26 Ultra",    "brand": "Samsung", "os": "Android", "camera": 90, "battery": 88, "performance": 91, "price": 1299},
+    {"id": "p4", "name": "Nothing Phone (4)",   "brand": "Nothing", "os": "Android", "camera": 78, "battery": 85, "performance": 76, "price": 649},
+    {"id": "p5", "name": "iPhone 17",           "brand": "Apple",   "os": "iOS",     "camera": 84, "battery": 78, "performance": 88, "price": 799},
+    {"id": "p6", "name": "OnePlus 15",          "brand": "OnePlus", "os": "Android", "camera": 86, "battery": 93, "performance": 90, "price": 899}
+  ]
+}
