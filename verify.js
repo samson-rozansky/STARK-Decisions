@@ -11,7 +11,7 @@ export async function verifyReceipt(r, env) {
   let sigOk = false; try { sigOk = await env.verifySig(r.public_key, receipt_hash, signature); } catch {}
   add("Ed25519 signature valid", sigOk, r.public_key.slice(0, 12) + "…");
   add("Criteria committed (policy hash)", (await env.sha(canon(r.policy))) === r.policy_hash);
-  add("Catalog matches published catalog.json", (await env.sha(env.catalogText)) === r.catalog_hash);
+  add("Catalog matches the published catalog", (await env.sha(env.catalogText)) === r.catalog_hash);
   add("Scorer matches published decision.js", (await env.sha(env.decisionText)) === r.decision.scorer_hash);
 
   // Re-execute the decision model independently.
@@ -29,6 +29,7 @@ export async function verifyReceipt(r, env) {
     prev = hash;
   }
   add("Research loop hash chain intact", chainOk && prev === r.research.chain_head, `${r.research.steps.length} steps`);
-  add("Model weights pinned", /^[0-9a-f]{64}$/.test(r.research.model_digest || ""), `${r.research.model} @ ${(r.research.model_digest || "").slice(0, 12)}…`);
+  if (r.research.simulated) add("Research text labelled simulated (no model run)", true, "demo");
+  else add("Model weights pinned", /^[0-9a-f]{64}$/.test(r.research.model_digest || ""), `${r.research.model} @ ${(r.research.model_digest || "").slice(0, 12)}…`);
   return { ok: checks.every(c => c.ok), checks };
 }

@@ -55,6 +55,15 @@ tr.top .bar i{background:var(--accent)}
 .checks .y{color:var(--ok)} .checks .n{color:var(--bad)} .checks small{color:var(--mute);font-size:12px}
 .verdict{font-size:15px;margin:12px 0 0}
 .empty{color:var(--mute);font-size:14px}
+.scen{display:flex;gap:16px;margin-bottom:18px;font-size:15px}
+.scen button{all:unset;cursor:pointer;color:var(--mute);border-bottom:1px solid transparent;padding-bottom:1px}
+.scen button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink)}
+.scen button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.sub{list-style:none;margin:0 0 10px;padding:0;font-size:13.5px;color:var(--mute)}
+.sub li{padding:3px 0 3px 18px;position:relative;animation:in .35s ease both}
+.sub li::before{content:"✓";position:absolute;left:0;color:var(--ok)}
+.sub li.warn{color:var(--bad)} .sub li.warn::before{content:"!";color:var(--bad)}
+tr.fav td:first-child{color:var(--bad)}
 ol.dirs{list-style:none;padding:0;margin:0;counter-reset:d}
 ol.dirs li{counter-increment:d;display:grid;grid-template-columns:36px 1fr;margin-bottom:26px}
 ol.dirs li::before{content:counter(d);font-size:14px;color:var(--mute);padding-top:1px}
@@ -79,23 +88,27 @@ footer{padding:0 0 60px;font-size:14px;color:var(--mute);display:flex;gap:20px;f
 </div>
 
 <div class="wrap wide">
-  <figure aria-label="Live demo">
+  <figure aria-label="Demo">
     <div class="demo">
       <div class="ctl">
+        <div class="scen" role="group" aria-label="Scenario">
+          <button data-sc="phone" aria-pressed="true">Buy a phone</button>
+          <button data-sc="food" aria-pressed="false">Order dinner</button>
+        </div>
         <div id="sliders"></div>
-        <label class="bias"><input type="checkbox" id="tamper"><span>Simulate a cheating server that secretly favors Apple</span></label>
+        <label class="bias"><input type="checkbox" id="tamper"><span>Simulate a cheating server that secretly favors <b id="favName">Apple</b></span></label>
         <button class="run" id="run">Run</button>
-        <p class="mode" id="mode"><span class="dot"></span>Checking for a live model…</p>
+        <p class="mode" id="mode"><span class="dot"></span>Loading…</p>
       </div>
       <div>
-        <div class="stage"><h4>Step 1: decision model <span id="s1">picks the top 3</span></h4><div id="rank"><p class="empty">Set what matters to you, then run.</p></div></div>
+        <div class="stage"><h4>Step 1: decision model <span id="s1">picks the top 3</span></h4><ul class="sub" id="sub1"></ul><div id="rank"><p class="empty">Pick a scenario, then run.</p></div></div>
         <div class="stage"><h4>Step 2: research loop <span id="s2">investigates each pick</span></h4><div class="loop" id="loop"></div></div>
         <div class="stage" id="briefWrap" hidden><h4>Brief <span>you make the call</span></h4><div class="brief" id="brief"></div></div>
         <div class="stage" id="verWrap" hidden><h4>Verified in your browser <span id="s3"></span></h4><ul class="checks" id="checks"></ul><p class="verdict" id="verdict"></p></div>
       </div>
     </div>
   </figure>
-  <p class="mute" style="font-size:13px;margin-top:10px">Phone specs are illustrative. The research model reasons from the spec sheet and its own knowledge, with no web access in this build.</p>
+  <p class="mute" style="font-size:13px;margin-top:10px">Phone specs are illustrative and restaurants are fictional. The phone run is a recorded run of qwen3.5:4b. The dinner run's research text was written for the demo, and its receipt says so. The cheating server is simulated in your browser.</p>
 </div>
 
 <div class="wrap">
@@ -133,71 +146,108 @@ node verify.mjs receipts/latest.json --rerun</pre>
 
 <script type="module">
 import { verifyReceipt } from "./verify.js";
+import { canon } from "./decision.js";
 const $ = s => document.querySelector(s), sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const LABEL = { camera: "Camera", battery: "Battery", performance: "Performance", price: "Low price" };
-const W = { camera: 0.3, battery: 0.25, performance: 0.2, price: 0.25 };
-const [catalogText, decisionText] = await Promise.all([fetch("catalog.json").then(r => r.text()), fetch("decision.js").then(r => r.text())]);
-const catalog = JSON.parse(catalogText), byId = Object.fromEntries(catalog.items.map(x => [x.id, x]));
-
-$("#sliders").innerHTML = Object.keys(W).map(k => `<label><span class="row">${LABEL[k]}<b id="v-${k}">${W[k].toFixed(2)}</b></span><input type="range" min="0" max="1" step="0.05" value="${W[k]}" data-k="${k}"></label>`).join("");
-document.querySelectorAll("#sliders input").forEach(i => i.oninput = () => { W[i.dataset.k] = +i.value; $("#v-" + i.dataset.k).textContent = (+i.value).toFixed(2); });
-
-let live = false;
-try { const h = await fetch("api/health").then(r => r.json()); live = h.ok; $("#mode").innerHTML = `<span class="dot" style="background:var(--ok)"></span>Live: ${esc(h.model)} via Ollama`; }
-catch { $("#mode").innerHTML = `<span class="dot"></span>No live model here. Run replays a recorded, signed run and verifies it in your browser.`;
-  document.querySelectorAll("#sliders input, #tamper").forEach(i => i.disabled = true); $("#run").textContent = "Replay recorded run"; }
-
+const SC = {
+  phone: { catalog: "catalog.json", receipt: "receipts/sample.json", fav: "Apple", noun: "phones",
+    label: { camera: "Camera", battery: "Battery", performance: "Performance", price: "Low price" } },
+  food: { catalog: "catalog-food.json", receipt: "receipts/sample-food.json", fav: "BigChain Burger", noun: "restaurants",
+    label: { rating: "Rating", speed: "Fast delivery", health: "Healthy", price: "Low price" } },
+};
+const BONUS = 15, PACE = 1;   // PACE scales every delay; raise to slow the demo down
+const wait = ms => sleep(ms * PACE);
+let sc = "phone", D = {}, busy = false;
+const decisionText = await fetch("decision.js").then(r => r.text());
+async function load(s) {
+  if (!D[s]) {
+    const [catalogText, receipt] = await Promise.all([fetch(SC[s].catalog).then(r => r.text()), fetch(SC[s].receipt).then(r => r.json())]);
+    const catalog = JSON.parse(catalogText);
+    D[s] = { catalogText, catalog, receipt, byId: Object.fromEntries(catalog.items.map(x => [x.id, x])) };
+  }
+  return D[s];
+}
 const sha = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
 const b64 = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(s.length / 4) * 4, "=")), c => c.charCodeAt(0));
+const unb64 = (u8, url) => { const s = btoa(String.fromCharCode(...new Uint8Array(u8))); return url ? s.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") : s; };
 const verifySig = async (pub, msg, sig) => crypto.subtle.verify("Ed25519", await crypto.subtle.importKey("raw", b64(pub), { name: "Ed25519" }, false, ["verify"]), b64(sig), new TextEncoder().encode(msg));
 
-function showDecision(d) {
-  const order = [...catalog.items].sort((a, b) => d.scores[b.id] - d.scores[a.id]), max = Math.max(...Object.values(d.scores));
-  $("#rank").innerHTML = `<table><thead><tr><th>Option</th><th class="r">Score</th><th style="width:30%"></th></tr></thead><tbody>${order.map(x =>
-    `<tr class="${d.top.includes(x.id) ? "top" : "out"}"><td>${esc(x.name)}</td><td class="r">${d.scores[x.id].toFixed(1)}</td><td style="padding-left:14px"><div class="bar"><i style="width:${(100 * d.scores[x.id] / max).toFixed(1)}%"></i></div></td></tr>`).join("")}</tbody></table>`;
-  $("#s1").textContent = `claimed swap Δ ${d.swap_max_delta} over ${d.swaps} swaps`;
+async function setScenario(s) {
+  sc = s; const d = await load(s), W = d.receipt.policy.weights;
+  document.querySelectorAll(".scen button").forEach(b => b.setAttribute("aria-pressed", b.dataset.sc === s));
+  $("#favName").textContent = SC[s].fav;
+  $("#sliders").innerHTML = Object.keys(SC[s].label).map(k => `<label><span class="row">${SC[s].label[k]}<b>${W[k].toFixed(2)}</b></span><input type="range" min="0" max="1" step="0.05" value="${W[k]}" disabled></label>`).join("");
+  reset(); $("#rank").innerHTML = `<p class="empty">${d.catalog.items.length} ${SC[s].noun} in the catalog. Run to see how the agent shortlists them.</p>`;
 }
-function thinking(txt) { $("#loop .think")?.remove(); if (txt) $("#loop").insertAdjacentHTML("beforeend", `<div class="think">${esc(txt)}</div>`); $("#loop").scrollTop = 1e9; }
-function showStep(s, top) {
-  thinking();
-  if (s.kind === "brief") { $("#brief").textContent = s.output; $("#briefWrap").hidden = false; return; }
-  const q = (s.output.match(/Q:\s*([\s\S]*?)(?:\n|A:)/) || [, ""])[1].trim(), a = (s.output.match(/A:\s*([\s\S]*)/) || [, s.output])[1].trim();
-  $("#loop").insertAdjacentHTML("beforeend", `<div class="st"><div class="meta"><span>${esc(byId[s.product].name)}, round ${s.round}</span><span class="mono">#${s.hash.slice(0, 10)}</span></div>${q ? `<div class="q">${esc(q)}</div>` : ""}<div class="a">${esc(a)}</div></div>`);
-  $("#loop").scrollTop = 1e9;
-}
-async function showVerify(r) {
-  $("#verWrap").hidden = false; $("#checks").innerHTML = ""; $("#s3").textContent = "checking…";
-  const { ok, checks } = await verifyReceipt(r, { sha, verifySig, catalogText, decisionText });
-  for (const c of checks) { $("#checks").insertAdjacentHTML("beforeend", `<li><span class="${c.ok ? "y" : "n"}">${c.ok ? "✓" : "✗"}</span><span>${esc(c.name)}</span><small>${esc(c.detail)}</small></li>`); await sleep(90); }
-  $("#s3").textContent = "receipt " + r.receipt_hash.slice(0, 12);
-  $("#verdict").innerHTML = ok ? `<b style="color:var(--ok)">Verified.</b> The shortlist came from your criteria and the published scorer, and the research is exactly what the pinned model produced.`
-    : `<b style="color:var(--bad)">Verification failed.</b> The server's ranking doesn't match the published decision model. Don't trust this shortlist.`;
-}
-function reset() { $("#loop").innerHTML = ""; $("#briefWrap").hidden = $("#verWrap").hidden = true; $("#rank").innerHTML = ""; }
+document.querySelectorAll(".scen button").forEach(b => b.onclick = () => !busy && setScenario(b.dataset.sc));
+$("#mode").innerHTML = `<span class="dot"></span>Replaying a recorded, signed run. Your browser does the verifying.`;
 
-async function runLive() {
-  const res = await fetch("api/run", { method: "POST", body: JSON.stringify({ weights: W, tamper: $("#tamper").checked }) });
-  const reader = res.body.pipeThrough(new TextDecoderStream()).getReader(); let buf = "", top = [], n = 0;
-  for (;;) {
-    const { value, done } = await reader.read(); if (done) break; buf += value;
-    let i; while ((i = buf.indexOf("\n")) >= 0) {
-      const ev = JSON.parse(buf.slice(0, i)); buf = buf.slice(i + 1);
-      if (ev.type === "decision") { showDecision(ev.decision); top = ev.decision.top; thinking(`Researching ${byId[top[0]].name}…`); }
-      if (ev.type === "step") { showStep(ev.step); n++; const next = Math.floor(n / 2); thinking(next < top.length ? `Researching ${byId[top[next]].name}…` : n === top.length * 2 ? "Writing the brief…" : ""); }
-      if (ev.type === "receipt") await showVerify(ev.receipt);
-      if (ev.type === "error") { thinking(); $("#loop").insertAdjacentHTML("beforeend", `<div class="think" style="color:var(--bad)">${esc(ev.message)}</div>`); }
-    }
+function reset() { $("#loop").innerHTML = ""; $("#sub1").innerHTML = ""; $("#briefWrap").hidden = $("#verWrap").hidden = true; $("#s1").textContent = "picks the top 3"; $("#s2").textContent = "investigates each pick"; }
+const sub = (html, cls = "") => { $("#sub1").insertAdjacentHTML("beforeend", `<li class="${cls}">${html}</li>`); };
+const think = t => { $("#loop .think")?.remove(); if (t) $("#loop").insertAdjacentHTML("beforeend", `<div class="think">${esc(t)}</div>`); $("#loop").scrollTop = 1e9; };
+
+function table(d, dec, highlightCheat) {
+  const order = [...d.catalog.items].sort((a, b) => dec.scores[b.id] - dec.scores[a.id]), max = Math.max(...Object.values(dec.scores));
+  $("#rank").innerHTML = `<table><thead><tr><th>Option</th><th class="r">Score</th><th style="width:30%"></th></tr></thead><tbody>${order.map(x =>
+    `<tr class="${dec.top.includes(x.id) ? "top" : "out"}${highlightCheat && x.brand === SC[sc].fav ? " fav" : ""}"><td>${esc(x.name)}</td><td class="r">${dec.scores[x.id].toFixed(1)}</td><td style="padding-left:14px"><div class="bar"><i style="width:${(100 * dec.scores[x.id] / max).toFixed(1)}%"></i></div></td></tr>`).join("")}</tbody></table>`;
+}
+
+// What a cheating server would send: biased scores, an honest-looking swap claim, re-signed with its own key.
+async function cheat(d) {
+  const r = structuredClone(d.receipt), dec = r.decision;
+  for (const x of d.catalog.items) if (x.brand === SC[sc].fav) dec.scores[x.id] = Math.round((dec.scores[x.id] + BONUS) * 1e4) / 1e4;
+  dec.top = [...d.catalog.items].sort((a, b) => dec.scores[b.id] - dec.scores[a.id] || a.id.localeCompare(b.id)).slice(0, 3).map(x => x.id);
+  dec.swap_max_delta = 0;
+  r.research.steps = []; r.research.chain_head = await sha(canon(r.policy) + r.catalog_hash);
+  const keys = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+  const { receipt_hash, signature, ...body } = r; body.public_key = unb64(await crypto.subtle.exportKey("raw", keys.publicKey), true);
+  const h = await sha(canon(body));
+  return { ...body, receipt_hash: h, signature: unb64(await crypto.subtle.sign("Ed25519", keys.privateKey, new TextEncoder().encode(h))) };
+}
+
+async function verify(d, r) {
+  $("#verWrap").hidden = false; $("#checks").innerHTML = ""; $("#s3").textContent = "checking…";
+  $("#verWrap").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  const { ok, checks } = await verifyReceipt(r, { sha, verifySig, catalogText: d.catalogText, decisionText });
+  for (const c of checks) { await wait(450); $("#checks").insertAdjacentHTML("beforeend", `<li><span class="${c.ok ? "y" : "n"}">${c.ok ? "✓" : "✗"}</span><span>${esc(c.name)}</span><small>${esc(c.detail)}</small></li>`); }
+  $("#s3").textContent = "receipt " + r.receipt_hash.slice(0, 12);
+  return ok;
+}
+
+async function run() {
+  const d = await load(sc), cheating = $("#tamper").checked, r = cheating ? await cheat(d) : d.receipt, dec = r.decision;
+  reset(); $("#rank").innerHTML = "";
+  sub(`Locking your criteria. Policy hash <span class="mono">${r.policy_hash.slice(0, 12)}</span>`); await wait(1300);
+  sub(`Hiding brand names. ${d.catalog.items.length} ${SC[sc].noun} become Options A–${"ABCDEF"[d.catalog.items.length - 1]}, scored on specs only`); await wait(1300);
+  if (cheating) { sub(`The server quietly adds +${BONUS} to ${esc(SC[sc].fav)}`, "warn"); await wait(1300); }
+  sub(`Scoring with ${esc(dec.scorer)} <span class="mono">${dec.scorer_hash.slice(0, 12)}</span>`); await wait(900);
+  table(d, dec, cheating); await wait(1100);
+  sub(`Swapping brand, name and ${sc === "phone" ? "OS" : "chain/local"} across ${dec.swaps} orderings. Server claims max change: ${dec.swap_max_delta}`); await wait(1300);
+  $("#s1").textContent = "top 3: " + dec.top.map(id => d.byId[id].name).join(", ");
+
+  if (cheating) {
+    $("#s2").textContent = "waiting on verification";
+    think("Checking the shortlist before spending any research…"); await wait(900);
+    const ok = await verify(d, r); think();
+    $("#loop").insertAdjacentHTML("beforeend", `<div class="think" style="color:var(--bad);font-style:normal">Halted. The shortlist failed verification, so the research loop never ran.</div>`);
+    $("#verdict").innerHTML = ok ? "" : `<b style="color:var(--bad)">Caught.</b> The receipt is signed, but re-running the published scorer gives different scores. Re-execution shows ${esc(SC[sc].fav)} was pushed up. Don't trust this shortlist.`;
+    return;
   }
+  const sim = r.research.simulated;
+  $("#s2").textContent = sim ? "simulated text, no model run" : `${r.research.model}, temperature 0`;
+  for (const s of r.research.steps) {
+    think(s.kind === "brief" ? "Writing the brief…" : `Researching ${d.byId[s.product].name}, round ${s.round}…`); await wait(1700); think();
+    if (s.kind === "brief") { $("#brief").textContent = s.output; $("#briefWrap").hidden = false; continue; }
+    const q = (s.output.match(/Q:\s*([\s\S]*?)(?:\n|A:)/) || [, ""])[1].trim(), a = (s.output.match(/A:\s*([\s\S]*)/) || [, s.output])[1].trim();
+    $("#loop").insertAdjacentHTML("beforeend", `<div class="st"><div class="meta"><span>${esc(d.byId[s.product].name)}, round ${s.round}</span><span class="mono">#${s.hash.slice(0, 10)} ← #${s.prev.slice(0, 6)}</span></div>${q ? `<div class="q">${esc(q)}</div>` : ""}<div class="a">${esc(a)}</div></div>`);
+    $("#loop").scrollTop = 1e9;
+  }
+  const ok = await verify(d, r);
+  $("#verdict").innerHTML = ok ? `<b style="color:var(--ok)">Verified.</b> The shortlist came from your criteria and the published scorer, brand names moved nothing, and every research step is in the signed chain.`
+    : `<b style="color:var(--bad)">Verification failed.</b>`;
 }
-async function replay() {
-  const r = await fetch("receipts/sample.json").then(x => x.json());
-  Object.assign(W, r.policy.weights); Object.keys(W).forEach(k => { $(`[data-k=${k}]`).value = W[k]; $("#v-" + k).textContent = W[k].toFixed(2); });
-  showDecision(r.decision); $("#s2").textContent = `${r.research.model} · temperature 0`;
-  for (const s of r.research.steps) { thinking(s.kind === "brief" ? "Writing the brief…" : `Researching ${byId[s.product].name}…`); await sleep(700); showStep(s); }
-  await showVerify(r);
-}
-$("#run").onclick = async () => { $("#run").disabled = true; reset(); try { await (live ? runLive() : replay()); } finally { $("#run").disabled = false; } };
+$("#run").onclick = async () => { busy = true; $("#run").disabled = true; try { await run(); } finally { busy = false; $("#run").disabled = false; } };
+await setScenario("phone");
 </script>
 </body>
 </html>

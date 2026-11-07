@@ -79,14 +79,14 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 <section class="slide" data-title="Title">
   <div style="margin:auto 0">
     <h1>A shopping agent that can prove it's neutral.</h1>
-    <p class="lede">STARK-Decisions shortlists what you asked for, explains why, and hands you a signed receipt anyone can check.</p>
+    <p class="lede">STARK-Decisions builds a shortlist from your criteria, explains each pick, and gives you a signed receipt that anyone can check.</p>
   </div>
   <p class="src">Sandia: securely implementing AI and agentic workflows &nbsp;·&nbsp; DoorDash: best merchant experience, most creative solution &nbsp;·&nbsp; github.com/samson-rozansky/STARK-Decisions</p>
 </section>
 
 <!-- 2 -->
 <section class="slide" data-title="The need">
-  <h2>"Get me a good phone." Who decided which brand you got?</h2>
+  <h2>"Get me a good phone." Someone else chose the brand.</h2>
   <div class="cols c2">
     <div class="col">
       <h3>A tuned model</h3>
@@ -97,7 +97,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
       <p>A platform runs a fair model when auditors look and a biased one in production. The audit passes; you get the other one.</p>
     </div>
   </div>
-  <p style="margin-top:56px">Today nobody can see either. Not you, not the merchant who lost the sale.</p>
+  <p style="margin-top:56px">Right now neither is visible to you, or to the merchant who lost the sale.</p>
 </section>
 
 <!-- 3 -->
@@ -126,7 +126,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 
 <!-- 4 -->
 <section class="slide" data-title="What consumers do today">
-  <h2>People already ask AI what to buy. They still want the last word.</h2>
+  <h2>People already ask AI what to buy, but they want the final say.</h2>
   <div class="cols c3">
     <div class="stat">
       <b>38%</b>
@@ -149,7 +149,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 
 <!-- 5 -->
 <section class="slide" data-title="The trust problem">
-  <h2>The blocker is trust. It feels like the AI thinks for you, and someone else might be steering it.</h2>
+  <h2>Trust is the blocker: the AI seems to think for you, and someone else may be steering it.</h2>
   <div class="cols c4">
     <div class="stat sm">
       <b>50%</b>
@@ -178,19 +178,19 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 
 <!-- 6 -->
 <section class="slide" data-title="Our answer">
-  <h2>Don't ask people to trust the agent. Give them a reason to be confident.</h2>
+  <h2>Let people check the agent instead of taking it on trust.</h2>
   <div class="cols c3">
     <div class="col">
       <h3>Your criteria</h3>
-      <p>You set what matters. It's committed by hash before any product is seen, so the goalposts can't move.</p>
+      <p>You set what matters. It's committed by hash before any product is seen, so it can't change afterward.</p>
     </div>
     <div class="col">
-      <h3>Proven fair</h3>
+      <h3>Checked for fairness</h3>
       <p>Brands are hidden while scoring, and an identity-swap test checks that names don't move scores. Every step is in a signed receipt.</p>
     </div>
     <div class="col">
       <h3>Your choice</h3>
-      <p>The agent shortlists three and explains each one. You make the final call.</p>
+      <p>The agent shortlists three and explains each. You decide.</p>
     </div>
   </div>
 </section>
@@ -199,7 +199,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 <section class="slide" data-title="How it works">
   <h2 style="margin-bottom:32px">Two steps, one receipt.</h2>
   <figure>
-  <svg viewBox="0 0 1280 440" width="100%" role="img" aria-label="Pipeline: committed criteria go into a deterministic decision model that picks a top three, a research loop investigates each, and everything is hashed into a signed receipt">
+  <svg viewBox="0 0 1280 440" width="100%" role="img" aria-label="Pipeline: committed criteria go into a deterministic decision model that picks a top three, a research loop investigates each, and everything is hashed into a signed receipt; both models are designed to get a zero-knowledge proof">
     <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#262722"/></marker></defs>
     <g font-family="Source Serif 4, Georgia, serif" fill="#262722">
       <!-- criteria -->
@@ -240,8 +240,10 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
       <text x="1120" y="142" font-size="19" fill="#6b6b62">each explained</text>
 
       <!-- receipt bar -->
-      <line x1="445" y1="250" x2="445" y2="318" stroke="#dcdad2"/>
-      <line x1="865" y1="250" x2="865" y2="318" stroke="#dcdad2"/>
+      <text x="284" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (zkML, e.g. EZKL)</text>
+      <text x="714" y="282" font-size="16" fill="#d9683b">Designed: ZK proof (FlashProve-style)</text>
+      <line x1="445" y1="292" x2="445" y2="318" stroke="#dcdad2"/>
+      <line x1="865" y1="292" x2="865" y2="318" stroke="#dcdad2"/>
       <line x1="100" y1="230" x2="100" y2="318" stroke="#dcdad2"/>
       <rect x="0" y="318" width="1280" height="110" fill="#262722"/>
       <text x="28" y="360" font-size="24" font-weight="600" fill="#f7f6f2">Signed receipt</text>
@@ -254,27 +256,27 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 
 <!-- 8 -->
 <section class="slide" data-title="What the receipt proves">
-  <h2 style="margin-bottom:28px">What the receipt proves, and what it doesn't.</h2>
+  <h2 style="margin-bottom:28px">What the receipt covers</h2>
   <table>
     <tr><th>Threat</th><th>Defense</th><th>Today</th></tr>
     <tr><td>Criteria changed after seeing the options</td><td>Criteria hashed and committed before scoring</td><td class="ok">Checked</td></tr>
     <tr><td>Scorer prefers a brand</td><td>Brands hidden; identity swap re-scores with names shuffled</td><td class="ok">Checked</td></tr>
     <tr><td>Different scorer code in production</td><td>Code hash in receipt; anyone re-executes it in the browser</td><td class="ok">Checked</td></tr>
     <tr><td>Receipt or research edited afterward</td><td>Ed25519 signature; research steps hash-chained</td><td class="ok">Checked</td></tr>
-    <tr><td>Research model swapped for a biased one</td><td>Weights digest is recorded and signed, but not yet proven</td><td class="acc">Next: ZK proof</td></tr>
+    <tr><td>Research model swapped for a biased one</td><td>Weights digest is signed; the ZK proof is designed, not built</td><td class="acc">Next: ZK proof</td></tr>
     <tr><td>Catalog specs or prices are wrong</td><td>Catalog hash shows what was used, not that it's true</td><td class="bad">Out of scope</td></tr>
   </table>
 </section>
 
 <!-- 9 -->
 <section class="slide" data-title="Merchants">
-  <h2>Merchants get the same receipt. Losing on specs is fixable; losing on your name isn't.</h2>
+  <h2>Merchants get the same receipt, so a loss on specs is something they can fix.</h2>
   <div class="cols c2" style="gap:80px">
     <div>
       <ol class="list">
-        <li><div>A restaurant that didn't win sees why <span>— price, ETA, rating, or fit to the order.</span></div></li>
+        <li><div>A restaurant that didn't win sees why <span>(price, ETA, rating, or fit to the order).</span></div></li>
         <li><div>Proof that it lost on the merits, not because of who it is or who paid.</div></li>
-        <li><div>A clear lever: change the thing you lost on, and the next run reflects it.</div></li>
+        <li><div>Something to act on: change what you lost on and the next run reflects it.</div></li>
       </ol>
     </div>
     <div class="receipt">
@@ -291,11 +293,12 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 
 <!-- 10 -->
 <section class="slide" data-title="Technical status">
-  <h2>Where it stands, honestly.</h2>
+  <h2>Where it stands</h2>
   <div class="cols c2" style="gap:80px">
     <div class="col">
       <h3>Built</h3>
       <p style="margin-bottom:14px">The full pipeline is implemented on GitHub: criteria commitment, blind scoring, identity-swap test, research loop, hash chain, Ed25519 receipt, in-browser verifier.</p>
+      <p style="margin-bottom:14px">Not built yet: the ZK proofs. Today step 2 is verified by re-running it on pinned weights at temperature 0, plus the signed hash chain.</p>
     </div>
     <div class="col">
       <h3>The catch</h3>
@@ -306,11 +309,12 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 
 <!-- 11 -->
 <section class="slide" data-title="Roadmap">
-  <h2>Next: prove the model, not just the scorer.</h2>
+  <h2>Next: a ZK proof for both steps</h2>
   <ol class="list">
-    <li><div>Zero-knowledge proof of inference <span>— verify the audited weights produced the research output, without revealing the weights. Anthropic's FlashProve (Nov 2026) shows hash-based proofs work today as a prototype, at about 70–95x GPU cost.</span></div></li>
-    <li><div>Public transparency log <span>— receipts appended to a log, so a platform can't show auditors one model and users another.</span></div></li>
-    <li><div>Merchant dashboard <span>— every lost decision, the reason, and the receipt to check it.</span></div></li>
+    <li><div>Step 1, the scorer <span>: zkML tools like EZKL make a proof practical today for a small model.</span></div></li>
+    <li><div>Step 2, the research model <span>: a FlashProve-style proof of inference shows the committed weights produced the output without revealing them. Anthropic's research prototype (Nov 2026) is hash-based (STARK-family) at about 70–95x GPU cost.</span></div></li>
+    <li><div>Public transparency log <span>: receipts are appended to it, so a platform can't show auditors one model and users another.</span></div></li>
+    <li><div>Merchant dashboard <span>: each lost decision, the reason, and the receipt to check it.</span></div></li>
   </ol>
   <p class="src">Anthropic, "Provable inference" (FlashProve), 2026 · anthropic.com/research/provable-inference</p>
 </section>
@@ -319,7 +323,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 <section class="slide" data-title="Close">
   <div style="margin:auto 0">
     <h1>Agents will shop for us. They should show their work.</h1>
-    <p class="lede" style="margin-bottom:44px">Your criteria, a fair shortlist, your choice, and a receipt anyone can check.</p>
+    <p class="lede" style="margin-bottom:44px">You set the criteria and make the choice. The receipt lets anyone check the rest.</p>
     <p><a href="https://github.com/samson-rozansky/STARK-Decisions">github.com/samson-rozansky/STARK-Decisions</a></p>
     <p><a href="http://samson.rozansky.org/STARK-Decisions/">samson.rozansky.org/STARK-Decisions</a></p>
   </div>

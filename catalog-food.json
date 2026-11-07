@@ -1,0 +1,12 @@
+{
+  "note": "Fictional restaurants for demo purposes. Scores 0-100 (speed = faster delivery), price in USD for dinner for two.",
+  "attributes": ["rating", "speed", "health", "price"],
+  "items": [
+    {"id": "r1", "name": "BigChain Burger",      "brand": "BigChain Burger",      "os": "chain", "rating": 72, "speed": 90, "health": 35, "price": 28},
+    {"id": "r2", "name": "Mama Lin's Noodles",   "brand": "Mama Lin's Noodles",   "os": "local", "rating": 94, "speed": 70, "health": 72, "price": 41},
+    {"id": "r3", "name": "Green Bowl Co.",       "brand": "Green Bowl Co.",       "os": "local", "rating": 88, "speed": 78, "health": 95, "price": 52},
+    {"id": "r4", "name": "Taqueria Sol",         "brand": "Taqueria Sol",         "os": "local", "rating": 91, "speed": 88, "health": 62, "price": 34},
+    {"id": "r5", "name": "Pizza Palace Express", "brand": "Pizza Palace Express", "os": "chain", "rating": 76, "speed": 85, "health": 40, "price": 36},
+    {"id": "r6", "name": "Saffron Kitchen",      "brand": "Saffron Kitchen",      "os": "local", "rating": 90, "speed": 65, "health": 80, "price": 47}
+  ]
+}
