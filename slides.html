@@ -67,6 +67,7 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
 .receipt{font-size:19px;line-height:1.7;color:var(--mute);background:var(--fig);padding:28px 32px}
 .receipt b{color:var(--ink);font-weight:400}
 
+table.rs{font-size:20.5px;line-height:1.38} table.rs td{padding:11px 22px 11px 0} table.rs td:first-child{width:27%;font-weight:600} table.rs td:nth-child(2){width:38%;color:var(--mute)}
 #count{position:fixed;right:20px;bottom:14px;font:14px/1 ui-monospace,Menlo,monospace;color:var(--mute);user-select:none}
 #hint{position:fixed;left:20px;bottom:14px;font-size:14px;color:var(--mute);user-select:none}
 @media (max-width:700px){#hint{display:none}}
@@ -316,6 +317,30 @@ figure{margin:0;background:var(--fig);padding:36px 40px}
     <li><div>Merchant dashboard <span>: each lost decision, the reason, and the receipt to check it.</span></div></li>
   </ol>
   <p class="src">Anthropic, "Provable inference" (FlashProve), 2026 · anthropic.com/research/provable-inference</p>
+</section>
+
+<!-- research 1 -->
+<section class="slide" data-title="Research: proofs">
+  <h2 style="margin-bottom:28px">What the research told us to build</h2>
+  <table class="rs">
+    <tr><th>Research</th><th>What it showed</th><th>So we</th></tr>
+    <tr><td>Goldwasser, Micali &amp; Rackoff (1985); Ben-Sasson et al., STARKs (2018)</td><td>You can prove a computation happened without revealing its inputs. STARKs need no trusted setup and rely only on hashes.</td><td>Picked STARK-family proofs over SNARKs like Groth16, which need a trusted setup ceremony.</td></tr>
+    <tr><td>Anthropic, FlashProve (2026)</td><td>Proof of inference now works at LLM scale, for greedy decoding, at about 70–95x the GPU cost.</td><td>Run one model at temperature 0 with pinned weights, and prove once per purchase decision, not per chat message.</td></tr>
+    <tr><td>Hubinger et al., Sleeper Agents (2024)</td><td>Behavior trained into weights can survive safety training and never show up in a prompt.</td><td>Commit to the weights hash and prove every step came from those weights.</td></tr>
+    <tr><td>Merkle (1987); Certificate Transparency, RFC 6962 (2013)</td><td>Hash chains and public logs make tampering after the fact visible.</td><td>Hash-chain every research step. A public receipt log is on the roadmap.</td></tr>
+  </table>
+</section>
+
+<!-- research 2 -->
+<section class="slide" data-title="Research: fairness and trust">
+  <h2 style="margin-bottom:28px">Research on fairness and trust</h2>
+  <table class="rs">
+    <tr><th>Research</th><th>What it showed</th><th>So we</th></tr>
+    <tr><td>Kusner et al., Counterfactual Fairness (2017); Bertrand &amp; Mullainathan (2004)</td><td>A decision is fair if it stays the same when only the identity changes. Identical résumés got different callbacks by name alone.</td><td>Re-rank every decision with brand names rotated between options, and prove that run too.</td></tr>
+    <tr><td>Kumar &amp; Lakkaraju (2024); Greshake et al. (2023)</td><td>A few lines of text on a product page can push an LLM to recommend it, or hijack it outright.</td><td>Take candidates only from a committed catalog, and check every fact the model cites against it.</td></tr>
+    <tr><td>Wang et al., LLMs are not fair evaluators (2023)</td><td>LLM judgments shift with details that shouldn't matter, like the order options appear in.</td><td>Test the model's decisions directly instead of trusting what it says about itself.</td></tr>
+    <tr><td>Dietvorst, Simmons &amp; Massey (2015, 2018)</td><td>People abandon algorithms after one mistake, but keep using them when they get some control.</td><td>You set the criteria and make the final call. The agent researches, shortlists and explains.</td></tr>
+  </table>
 </section>
 
 <!-- 12 -->
